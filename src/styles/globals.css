@@ -570,6 +570,44 @@ body {
 .marketing-ghost { padding: 9px 12px; }
 .marketing-primary { display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 13px 17px; border: 1px solid rgba(255, 155, 82, .5); border-radius: 13px; color: #4b2868; font-size: 12px; font-weight: 800; background: linear-gradient(135deg, #ff9a61, #ffd66e); box-shadow: 0 12px 25px rgba(255, 154, 92, .25); transition: transform .2s ease, box-shadow .2s ease; }
 .marketing-primary:hover { transform: translateY(-3px); box-shadow: 0 17px 32px rgba(255, 154, 92, .34); }
+
+.trip-setup-backdrop { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 20px; background: rgba(20, 16, 62, .48); backdrop-filter: blur(12px); }
+.trip-setup-modal { width: min(900px, 100%); max-height: min(760px, 92vh); overflow: auto; padding: 30px; background: rgba(248, 248, 255, .94); border: 1px solid rgba(81, 68, 199, .18); box-shadow: 0 30px 100px rgba(24, 17, 76, .3); }
+.theme-dark .trip-setup-modal { background: rgba(20, 24, 52, .97); color: #f4f2ff; border-color: rgba(175, 165, 255, .25); }
+.trip-setup-header { display: flex; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
+.trip-setup-header h2 { margin: 9px 0 5px; font-size: clamp(28px, 4vw, 42px); letter-spacing: -.05em; }
+.trip-setup-header p { margin: 0; color: #77719a; }
+.theme-dark .trip-setup-header p, .theme-dark .field-hint { color: #aaa6ca; }
+.trip-setup-close { width: 38px; height: 38px; border-radius: 50%; color: #5a4db2; background: rgba(81, 68, 199, .1); }
+.trip-setup-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 22px; }
+.trip-setup-form, .trip-calculation-preview { padding: 22px; border-radius: 20px; background: rgba(255,255,255,.54); border: 1px solid rgba(81,68,199,.12); }
+.theme-dark .trip-setup-form, .theme-dark .trip-calculation-preview { background: rgba(255,255,255,.06); border-color: rgba(175,165,255,.18); }
+.trip-setup-form label { display: block; margin-bottom: 14px; color: #4d4479; font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+.theme-dark .trip-setup-form label { color: #d0cbf1; }
+.trip-setup-form input, .trip-setup-form textarea, .trip-setup-form select { display: block; width: 100%; margin-top: 7px; padding: 11px 12px; border: 1px solid rgba(81,68,199,.16); border-radius: 11px; outline: 0; color: #33285f; background: rgba(255,255,255,.72); font: inherit; font-size: 13px; box-sizing: border-box; }
+.theme-dark .trip-setup-form input, .theme-dark .trip-setup-form textarea, .theme-dark .trip-setup-form select { color: #f6f3ff; background: rgba(5,8,25,.4); border-color: rgba(175,165,255,.22); }
+.field-hint { float: right; color: #8c87a9; font-size: 9px; font-weight: 500; letter-spacing: 0; text-transform: none; }
+.setup-expenses-heading { display: flex; align-items: center; justify-content: space-between; margin: 20px 0 9px; color: #4d4479; font-size: 13px; }
+.theme-dark .setup-expenses-heading { color: #e4e0ff; }
+.setup-add-button { display: inline-flex; align-items: center; gap: 4px; color: #6454c7; font-size: 11px; font-weight: 800; }
+.setup-expense-row { display: grid; grid-template-columns: 1fr .65fr .8fr 28px; gap: 7px; margin-bottom: 8px; }
+.setup-expense-row input, .setup-expense-row select { margin-top: 0; padding: 9px; font-size: 11px; }
+.setup-remove-button { color: #b45d72; }
+.setup-continue { width: 100%; margin-top: 16px; }
+.trip-calculation-preview h3 { margin: 11px 0 20px; font-size: 23px; letter-spacing: -.04em; }
+.calculation-total { display: flex; justify-content: space-between; align-items: center; padding: 13px 0; border-bottom: 1px solid rgba(81,68,199,.1); color: #77719a; font-size: 11px; }
+.calculation-total strong { color: #3f2e9e; font-size: 18px; }
+.theme-dark .calculation-total strong { color: #f5c979; }
+.calculation-list { margin: 12px 0; }
+.calculation-row { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; color: #4d4479; font-size: 12px; }
+.theme-dark .calculation-row { color: #ddd9f4; }
+.calculation-row strong { font-size: 11px; }
+.calculation-explainer { margin-top: 16px; padding: 14px; border-radius: 14px; color: #69628d; background: rgba(81,68,199,.07); font-size: 11px; line-height: 1.6; }
+.theme-dark .calculation-explainer { color: #c3bfdf; background: rgba(175,165,255,.1); }
+.calculation-explainer strong { color: #5545bb; }
+.theme-dark .calculation-explainer strong { color: #ffd37c; }
+.calculation-explainer p { margin: 6px 0 0; }
+.calculation-explainer small { display: block; margin-top: 8px; color: #c37e4a; }
 .header-cta { padding: 10px 14px; }
 .marketing-theme-toggle, .marketing-menu-button { display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid var(--marketing-line); border-radius: 11px; color: var(--marketing-accent); background: rgba(255,255,255,.28); }
 .marketing-menu-button { display: none; }

@@ -8,9 +8,11 @@ import {
   Compass,
   Menu,
   Moon,
+  Plus,
   Receipt,
   Sparkles,
   Sun,
+  Trash2,
   Users,
   X,
 } from 'lucide-react';
@@ -48,13 +50,31 @@ const scrollToSection = (id: string) => {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
 
+type SetupExpense = { title: string; amount: string; paidBy: number };
+
 export const MarketingLanding: React.FC<MarketingLandingProps> = ({ isDarkTheme, onThemeToggle }) => {
-  const { participants, participantBalances, bookings, totalTripCost, setIsAddExpenseOpen } = useTrip();
+  const { participants, participantBalances, bookings, totalTripCost } = useTrip();
   const [menuOpen, setMenuOpen] = useState(false);
   const [useCase, setUseCase] = useState(0);
   const [demoJoined, setDemoJoined] = useState(false);
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const [setupOpen, setSetupOpen] = useState(false);
+  const [tripName, setTripName] = useState('My group trip');
+  const [travelerInput, setTravelerInput] = useState('You, Alex, Sam, Priya');
+  const [splitModel, setSplitModel] = useState<'equal' | 'activity'>('equal');
+  const [setupExpenses, setSetupExpenses] = useState<SetupExpense[]>([
+    { title: 'Accommodation', amount: '24000', paidBy: 0 },
+  ]);
+
+  const setupTravelers = travelerInput.split(',').map((name) => name.trim()).filter(Boolean);
+  const setupTotal = setupExpenses.reduce((sum, expense) => sum + (Number(expense.amount) || 0), 0);
+  const setupShare = setupTravelers.length > 0 ? Math.round(setupTotal / setupTravelers.length) : 0;
+  const setupPaid = setupTravelers.map((_, index) => setupExpenses
+    .filter((expense) => expense.paidBy === index)
+    .reduce((sum, expense) => sum + (Number(expense.amount) || 0), 0));
+  const setupBalances = setupTravelers.map((name, index) => ({ name, amount: setupPaid[index] - setupShare }));
+  const openTripSetup = () => setSetupOpen(true);
 
   const visibleBalances = useMemo(
     () => participantBalances.slice(0, 3).map((balance) => ({
@@ -85,7 +105,7 @@ export const MarketingLanding: React.FC<MarketingLandingProps> = ({ isDarkTheme,
             {isDarkTheme ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
           <button className="marketing-ghost" onClick={() => scrollToSection('footer')}>Sign in</button>
-          <button className="marketing-primary header-cta" onClick={() => setIsAddExpenseOpen(true)}>
+          <button className="marketing-primary header-cta" onClick={openTripSetup}>
             Start a Trip <ArrowRight className="w-4 h-4" />
           </button>
           <button className="marketing-menu-button" onClick={() => setMenuOpen(true)} aria-label="Open menu">
@@ -110,6 +130,40 @@ export const MarketingLanding: React.FC<MarketingLandingProps> = ({ isDarkTheme,
         </div>
       )}
 
+      {setupOpen && (
+        <div className="trip-setup-backdrop" onClick={() => setSetupOpen(false)}>
+          <section className="trip-setup-modal glass-panel" onClick={(event) => event.stopPropagation()} aria-labelledby="trip-setup-title">
+            <div className="trip-setup-header">
+              <div><span className="marketing-eyebrow">NEW TRIP WORKSPACE</span><h2 id="trip-setup-title">Start with the numbers.</h2><p>Add the basics now. Every balance below is calculated live from your entries.</p></div>
+              <button className="trip-setup-close" onClick={() => setSetupOpen(false)} aria-label="Close trip setup"><X /></button>
+            </div>
+            <div className="trip-setup-grid">
+              <div className="trip-setup-form">
+                <label>Trip name<input value={tripName} onChange={(event) => setTripName(event.target.value)} /></label>
+                <label>Travelers <span className="field-hint">separate names with commas</span><textarea value={travelerInput} onChange={(event) => setTravelerInput(event.target.value)} rows={2} /></label>
+                <label>Split model<select value={splitModel} onChange={(event) => setSplitModel(event.target.value as 'equal' | 'activity')}><option value="equal">Equal split</option><option value="activity">Per-activity split (coming next)</option></select></label>
+                <div className="setup-expenses-heading"><strong>Expenses</strong><button className="setup-add-button" onClick={() => setSetupExpenses((current) => [...current, { title: '', amount: '', paidBy: 0 }])}><Plus className="w-3 h-3" /> Add expense</button></div>
+                {setupExpenses.map((expense, index) => <div className="setup-expense-row" key={index}>
+                  <input value={expense.title} onChange={(event) => setSetupExpenses((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, title: event.target.value } : item))} placeholder="Expense name" />
+                  <input value={expense.amount} onChange={(event) => setSetupExpenses((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, amount: event.target.value } : item))} type="number" min="0" placeholder="Amount" />
+                  <select value={expense.paidBy} onChange={(event) => setSetupExpenses((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, paidBy: Number(event.target.value) } : item))}>{setupTravelers.map((name, travelerIndex) => <option value={travelerIndex} key={name + travelerIndex}>{name} paid</option>)}</select>
+                  {setupExpenses.length > 1 && <button className="setup-remove-button" onClick={() => setSetupExpenses((current) => current.filter((_, itemIndex) => itemIndex !== index))} aria-label="Remove expense"><Trash2 className="w-4 h-4" /></button>}
+                </div>)}
+                <button className="marketing-primary setup-continue" onClick={() => setSetupOpen(false)}>Open {tripName || 'your trip'} <ArrowRight className="w-4 h-4" /></button>
+              </div>
+              <div className="trip-calculation-preview">
+                <span className="marketing-eyebrow">LIVE CALCULATION</span>
+                <h3>{tripName || 'Your trip'}</h3>
+                <div className="calculation-total"><span>Total trip cost</span><strong>{formatINR(setupTotal)}</strong></div>
+                <div className="calculation-total"><span>Fair share per traveler</span><strong>{formatINR(setupShare)}</strong></div>
+                <div className="calculation-list">{setupBalances.map((balance) => <div className="calculation-row" key={balance.name}><span>{balance.name}</span><strong className={balance.amount >= 0 ? 'positive' : 'negative'}>{balance.amount >= 0 ? `${formatINR(balance.amount)} gets back` : `${formatINR(Math.abs(balance.amount))} owes`}</strong></div>)}</div>
+                <div className="calculation-explainer"><strong>How it works</strong><p>1. Add every active expense.<br />2. Split each expense between the travelers included.<br />3. Each balance = amount paid − fair share.<br />4. Positive balances receive money; negative balances pay it.</p>{splitModel === 'activity' && <small>Per-activity splits will let you choose who joins each expense in the full workspace.</small>}</div>
+              </div>
+            </div>
+          </section>
+        </div>
+      )}
+
       <main id="home">
         <section className="marketing-hero marketing-container">
           <div className="hero-copy">
@@ -117,7 +171,7 @@ export const MarketingLanding: React.FC<MarketingLandingProps> = ({ isDarkTheme,
             <h1>Group trips,<br /><em>without the group chat math.</em></h1>
             <p>One shared ledger for your itinerary, participants, bookings, and balances. Everyone sees what they joined, what they paid, and what they owe.</p>
             <div className="hero-actions">
-              <button className="marketing-primary" onClick={() => setIsAddExpenseOpen(true)}>
+              <button className="marketing-primary" onClick={openTripSetup}>
                 Start Your Trip Free <ArrowRight className="w-4 h-4" />
               </button>
               <button className="marketing-text-link" onClick={() => scrollToSection('how-it-works')}>See how it works <ArrowRight className="w-4 h-4" /></button>
@@ -169,16 +223,16 @@ export const MarketingLanding: React.FC<MarketingLandingProps> = ({ isDarkTheme,
 
         <section className="marketing-container models-section" id="split-models">
           <div className="section-heading row-heading"><div><span className="marketing-eyebrow">BUILT FOR YOUR GROUP</span><h2>Every trip has its own rhythm.</h2></div><div className="carousel-controls"><button onClick={() => setUseCase((useCase + useCases.length - 1) % useCases.length)}><ChevronLeft /></button><span>0{useCase + 1} / 0{useCases.length}</span><button onClick={() => setUseCase((useCase + 1) % useCases.length)}><ChevronRight /></button></div></div>
-          <div className={`use-case-card glass-panel bg-${useCases[useCase].gradient}`}><div className="use-case-visual"><Users className="w-12 h-12" /><span>{useCases[useCase].tag}</span></div><div className="use-case-copy"><span className="marketing-eyebrow">USE CASE 0{useCase + 1}</span><h3>{useCases[useCase].title}</h3><p>{useCases[useCase].text}</p><button className="marketing-text-link" onClick={() => setIsAddExpenseOpen(true)}>View a sample trip <ArrowRight className="w-4 h-4" /></button></div></div>
+          <div className={`use-case-card glass-panel bg-${useCases[useCase].gradient}`}><div className="use-case-visual"><Users className="w-12 h-12" /><span>{useCases[useCase].tag}</span></div><div className="use-case-copy"><span className="marketing-eyebrow">USE CASE 0{useCase + 1}</span><h3>{useCases[useCase].title}</h3><p>{useCases[useCase].text}</p><button className="marketing-text-link" onClick={openTripSetup}>View a sample trip <ArrowRight className="w-4 h-4" /></button></div></div>
         </section>
 
         <section className="closing-band" id="pricing">
-          <div className="marketing-container closing-inner"><div><span className="marketing-eyebrow">PLANS CHANGE. YOUR LEDGER KEEPS UP.</span><h2>Settle the trip.<br /><em>Not the friendships.</em></h2><p>Participants joining, cancellations, refunds, and added expenses all recalculate automatically.</p><button className="marketing-primary" onClick={() => setIsAddExpenseOpen(true)}>Start Your Trip Free <ArrowRight className="w-4 h-4" /></button><small>Free for small trips. No app required to view your balance.</small></div><div className="closing-screens"><div className="mini-screen screen-back"><span>PERSONAL SUMMARY</span><strong>₹10,800</strong><small>You're all settled</small></div><div className="mini-screen screen-front"><span>GROUP OVERVIEW</span><strong>₹64,800</strong><div className="mini-bars"><i /><i /><i /><i /></div></div></div></div>
+          <div className="marketing-container closing-inner"><div><span className="marketing-eyebrow">PLANS CHANGE. YOUR LEDGER KEEPS UP.</span><h2>Settle the trip.<br /><em>Not the friendships.</em></h2><p>Participants joining, cancellations, refunds, and added expenses all recalculate automatically.</p><button className="marketing-primary" onClick={openTripSetup}>Start Your Trip Free <ArrowRight className="w-4 h-4" /></button><small>Free for small trips. No app required to view your balance.</small></div><div className="closing-screens"><div className="mini-screen screen-back"><span>PERSONAL SUMMARY</span><strong>₹10,800</strong><small>You're all settled</small></div><div className="mini-screen screen-front"><span>GROUP OVERVIEW</span><strong>₹64,800</strong><div className="mini-bars"><i /><i /><i /><i /></div></div></div></div>
         </section>
       </main>
 
       <footer className="marketing-footer" id="footer">
-        <div className="marketing-container footer-grid"><div className="footer-brand"><button className="marketing-brand"><span className="marketing-brand-mark"><Sparkles className="w-4 h-4" /></span><span>GroupTrip <b>Ledger</b></span></button><p>Clearer trips. Fairer splits.<br />Fewer awkward reminders.</p><button className="marketing-primary" onClick={() => setIsAddExpenseOpen(true)}>Start a Trip <ArrowRight className="w-4 h-4" /></button></div><div className="footer-links"><span>EXPLORE</span><button onClick={() => scrollToSection('home')}>Home</button><button onClick={() => scrollToSection('how-it-works')}>How it works</button><button onClick={() => scrollToSection('split-models')}>Split Models</button><button onClick={() => scrollToSection('pricing')}>Pricing</button><button onClick={() => scrollToSection('story')}>Our Story</button></div><div className="footer-links"><span>LEGAL</span><button>Privacy Policy</button><button>Terms & Conditions</button><button>Contact</button><a href="https://github.com/NameIsNotMentioned/Sigma" target="_blank" rel="noreferrer">GitHub</a></div><div className="newsletter"><span>ONE USEFUL EMAIL, OCCASIONALLY.</span><p>Trip planning ideas and product updates. No noise.</p><form onSubmit={(event) => { event.preventDefault(); setSubscribed(true); }}><input value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" type="email" required /><button type="submit">{subscribed ? <Check /> : <ArrowRight />}</button></form></div></div><div className="marketing-container footer-bottom"><span>© 2026 GroupTrip Ledger</span><span>Built for better group trips.</span></div>
+        <div className="marketing-container footer-grid"><div className="footer-brand"><button className="marketing-brand"><span className="marketing-brand-mark"><Sparkles className="w-4 h-4" /></span><span>GroupTrip <b>Ledger</b></span></button><p>Clearer trips. Fairer splits.<br />Fewer awkward reminders.</p><button className="marketing-primary" onClick={openTripSetup}>Start a Trip <ArrowRight className="w-4 h-4" /></button></div><div className="footer-links"><span>EXPLORE</span><button onClick={() => scrollToSection('home')}>Home</button><button onClick={() => scrollToSection('how-it-works')}>How it works</button><button onClick={() => scrollToSection('split-models')}>Split Models</button><button onClick={() => scrollToSection('pricing')}>Pricing</button><button onClick={() => scrollToSection('story')}>Our Story</button></div><div className="footer-links"><span>LEGAL</span><button>Privacy Policy</button><button>Terms & Conditions</button><button>Contact</button><a href="https://github.com/NameIsNotMentioned/Sigma" target="_blank" rel="noreferrer">GitHub</a></div><div className="newsletter"><span>ONE USEFUL EMAIL, OCCASIONALLY.</span><p>Trip planning ideas and product updates. No noise.</p><form onSubmit={(event) => { event.preventDefault(); setSubscribed(true); }}><input value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" type="email" required /><button type="submit">{subscribed ? <Check /> : <ArrowRight />}</button></form></div></div><div className="marketing-container footer-bottom"><span>© 2026 GroupTrip Ledger</span><span>Built for better group trips.</span></div>
       </footer>
     </div>
   );
