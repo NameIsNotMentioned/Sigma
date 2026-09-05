@@ -19,16 +19,20 @@ interface NavItem {
   badge?: string;
 }
 
-const NAV_ITEMS: NavItem[] = [
-  { id: 'overview', label: 'Overview', icon: Compass },
-  { id: 'itinerary', label: 'Itinerary', icon: Calendar },
-  { id: 'expenses', label: 'Expenses', icon: Receipt },
-  { id: 'people', label: 'People', icon: Users },
-  { id: 'settlements', label: 'Settlements', icon: ArrowLeftRight, badge: '5→3' },
-];
-
 export const Sidebar: React.FC = () => {
-  const { activeTab, setActiveTab, trip, participants, setSelectedParticipantId } = useTrip();
+  const { activeTab, setActiveTab, trip, participants, setSelectedParticipantId, unoptimizedTransfers, optimizedTransfers } = useTrip();
+  const navItems: NavItem[] = [
+    { id: 'overview', label: 'Overview', icon: Compass },
+    { id: 'itinerary', label: 'Itinerary', icon: Calendar },
+    { id: 'expenses', label: 'Expenses', icon: Receipt },
+    { id: 'people', label: 'People', icon: Users },
+    {
+      id: 'settlements',
+      label: 'Settlements',
+      icon: ArrowLeftRight,
+      badge: unoptimizedTransfers.length > 0 ? `${unoptimizedTransfers.length}→${optimizedTransfers.length}` : undefined,
+    },
+  ];
 
   return (
     <aside className="w-64 shrink-0 hidden md:block">
@@ -77,7 +81,7 @@ export const Sidebar: React.FC = () => {
               <div className="px-2 pb-2 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
                 Menu
               </div>
-              {NAV_ITEMS.map((item) => {
+              {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = activeTab === item.id;
                 return (

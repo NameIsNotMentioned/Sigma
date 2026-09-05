@@ -200,7 +200,7 @@ body {
 }
 
 /* Deep indigo mode keeps the bright cyan, amber, and violet accents visible. */
-.app-shell.theme-dark {
+.theme-dark .app-shell {
   background:
     radial-gradient(circle at 82% 4%, rgba(255, 166, 73, .16), transparent 24rem),
     radial-gradient(circle at 16% 30%, rgba(111, 88, 235, .22), transparent 28rem),
