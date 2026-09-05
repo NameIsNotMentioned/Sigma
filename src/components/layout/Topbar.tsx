@@ -3,6 +3,7 @@ import { useTrip, ActiveTab } from '../../context/TripContext';
 import { Button, Badge } from 'open-glass-ui';
 import { Plus, Calendar, Compass, Receipt, Users, ArrowLeftRight, Sparkles, Menu, Sun, Moon } from 'lucide-react';
 import { formatDate } from '../../lib/formatters';
+import { useAuth } from '../../context/AuthContext';
 
 export const Topbar: React.FC<{
   onMenuToggle: () => void;
@@ -17,6 +18,7 @@ export const Topbar: React.FC<{
     setIsSettlementOptimized,
     isSettlementOptimized,
   } = useTrip();
+  const { user, signOut } = useAuth();
 
   return (
     <header className="topbar sticky top-0 z-20 border-b border-white/10 bg-[#07111F]/80 backdrop-blur-xl px-4 lg:px-8 py-3.5 flex items-center justify-between gap-4">
@@ -94,6 +96,7 @@ export const Topbar: React.FC<{
           {isSettlementOptimized ? 'Show 5 Transfers' : 'Optimize (5→3)'}
         </Button>
 
+        <span className="hidden lg:inline text-[10px] text-slate-400 max-w-[180px] truncate" title={user?.email}>{user?.email}</span>
         <button className="menu-chip flex" onClick={onMenuToggle} aria-label="Open trip menu">
         <Menu className="w-4 h-4" />
         </button>
@@ -107,6 +110,7 @@ export const Topbar: React.FC<{
           <Plus className="w-3.5 h-3.5 mr-1.5" />
           Add Expense
         </Button>
+        <button className="hidden sm:inline text-[10px] text-slate-400 hover:text-white" onClick={() => void signOut()}>Sign out</button>
       </div>
     </header>
   );

@@ -78,7 +78,13 @@ export const MarketingLanding: React.FC<MarketingLandingProps> = ({ isDarkTheme,
     .filter((expense) => expense.paidBy === index)
     .reduce((sum, expense) => sum + (Number(expense.amount) || 0), 0));
   const setupBalances = setupTravelers.map((name, index) => ({ name, amount: setupPaid[index] - setupShare }));
-  const openTripSetup = () => setSetupOpen(true);
+  const openTripSetup = () => {
+    if (!user) {
+      navigate('/login?next=/dashboard');
+      return;
+    }
+    setSetupOpen(true);
+  };
 
   const visibleBalances = useMemo(
     () => participantBalances.slice(0, 3).map((balance) => ({
@@ -153,7 +159,7 @@ export const MarketingLanding: React.FC<MarketingLandingProps> = ({ isDarkTheme,
                   <select value={expense.paidBy} onChange={(event) => setSetupExpenses((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, paidBy: Number(event.target.value) } : item))}>{setupTravelers.map((name, travelerIndex) => <option value={travelerIndex} key={name + travelerIndex}>{name} paid</option>)}</select>
                   {setupExpenses.length > 1 && <button className="setup-remove-button" onClick={() => setSetupExpenses((current) => current.filter((_, itemIndex) => itemIndex !== index))} aria-label="Remove expense"><Trash2 className="w-4 h-4" /></button>}
                 </div>)}
-                <button className="marketing-primary setup-continue" onClick={() => { setSetupOpen(false); navigate(user ? '/dashboard' : '/login'); }}>Open {tripName || 'your trip'} <ArrowRight className="w-4 h-4" /></button>
+                <button className="marketing-primary setup-continue" onClick={() => { sessionStorage.setItem('grouptrip-draft', JSON.stringify({ name: tripName, travelers: setupTravelers, expenses: setupExpenses })); setSetupOpen(false); navigate('/dashboard'); }}>Open {tripName || 'your trip'} <ArrowRight className="w-4 h-4" /></button>
               </div>
               <div className="trip-calculation-preview">
                 <span className="marketing-eyebrow">LIVE CALCULATION</span>

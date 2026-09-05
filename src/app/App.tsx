@@ -28,7 +28,7 @@ export const App: React.FC = () => {
           <Routes>
             <Route path="/" element={<TripProvider><MarketingLanding isDarkTheme={isDarkTheme} onThemeToggle={() => setIsDarkTheme((current) => !current)} /></TripProvider>} />
             <Route path="/login" element={<Login />} />
-            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard isDarkTheme={isDarkTheme} onThemeToggle={() => setIsDarkTheme((current) => !current)} /></ProtectedRoute>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </HashRouter>
