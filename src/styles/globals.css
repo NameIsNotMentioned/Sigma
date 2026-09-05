@@ -657,6 +657,12 @@ body {
 .theme-dark .data-stats div { background: rgba(175,165,255,.1); }
 .theme-dark .data-stats strong { color: #ffd37c; }
 .route-state { display: grid; min-height: 100vh; place-items: center; color: #554b85; background: #f1f1ff; }
+.route-error { display: grid; min-height: 100vh; place-items: center; padding: 24px; background: #f1f1ff; color: #302561; }
+.route-error-card { width: min(560px, 100%); padding: 30px; background: rgba(255,255,255,.78); }
+.route-error-card h1 { margin: 12px 0 8px; font-size: 32px; letter-spacing: -.06em; }
+.route-error-card p { margin: 0 0 22px; color: #8d4760; line-height: 1.6; }
+.theme-dark .route-error { background: #0b1023; color: #f4f2ff; }
+.theme-dark .route-error-card { background: rgba(20,24,52,.9); }
 @media (max-width: 760px) { .data-page, .auth-page { padding: 18px; } .data-header { margin-bottom: 40px; } .data-user { display: none; } .data-heading { align-items: start; flex-direction: column; gap: 15px; } .data-grid, .trip-setup-grid { grid-template-columns: 1fr; } .expense-form { grid-template-columns: 1fr !important; } .setup-expense-row { grid-template-columns: 1fr 1fr 28px; } .setup-expense-row select { grid-column: 1 / -1; } }
 .header-cta { padding: 10px 14px; }
 .marketing-theme-toggle, .marketing-menu-button { display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid var(--marketing-line); border-radius: 11px; color: var(--marketing-accent); background: rgba(255,255,255,.28); }
