@@ -74,7 +74,7 @@ export const Overview: React.FC = () => {
             </div>
             <div className="flex items-center gap-1.5 bg-white/5 px-3 py-1.5 rounded-xl border border-white/5">
               <Calendar className="w-4 h-4 text-purple-400" />
-              <span>4 Days • 5 Key Itinerary Stops</span>
+              <span>{upcomingBookings.length} Itinerary Items</span>
             </div>
             <div className="flex items-center gap-1.5 bg-white/5 px-3 py-1.5 rounded-xl border border-white/5">
               <CheckCircle2 className="w-4 h-4 text-emerald-400" />
@@ -181,7 +181,11 @@ export const Overview: React.FC = () => {
           </div>
 
           {/* Interactive 3D Sphere Canvas */}
-          <TripSphere destination={trip.destination || 'Trip route'} expenses={activeExpenses} />
+          <TripSphere
+            destination={trip.destination || 'Trip route'}
+            expenses={activeExpenses}
+            itinerary={bookings.filter((booking) => booking.status !== 'cancelled')}
+          />
         </div>
 
         {/* Right 5 cols: Upcoming Itinerary Preview */}

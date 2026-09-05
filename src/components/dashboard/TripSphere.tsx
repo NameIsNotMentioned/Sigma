@@ -255,25 +255,45 @@ export const TripSphere: React.FC<{
     amount: number;
     vendor?: string;
   }>;
-}> = ({ destination = 'Goa, India', expenses = [] }) => {
+  itinerary?: Array<{
+    id: string;
+    title: string;
+    category: string;
+    date: string;
+    vendor?: string;
+  }>;
+}> = ({ destination = 'Goa, India', expenses = [], itinerary = [] }) => {
   const [hoveredNode, setHoveredNode] = useState<DestinationNode | null>(null);
   const [selectedNode, setSelectedNode] = useState<DestinationNode | null>(null);
   const [isPaused, setIsPaused] = useState(false);
   const [webglError, setWebglError] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-  const nodes = expenses.map((expense, index): DestinationNode => {
-    const angle = (index / Math.max(expenses.length, 1)) * Math.PI * 2;
+  const activityItems = [
+    ...expenses.map((expense) => ({
+      ...expense,
+      id: `expense-${expense.id}`,
+      tag: `${expense.title} · ₹${Math.round(expense.amount).toLocaleString('en-IN')}`,
+    })),
+    ...itinerary.map((booking) => ({
+      ...booking,
+      id: `itinerary-${booking.id}`,
+      amount: undefined,
+      tag: booking.vendor ? `${booking.title} · ${booking.vendor}` : booking.title,
+    })),
+  ];
+  const nodes = activityItems.map((item, index): DestinationNode => {
+    const angle = (index / Math.max(activityItems.length, 1)) * Math.PI * 2;
     const latitude = ((index % 3) - 1) * 0.65;
     const radius = Math.cos(latitude) * 1.5;
     const colors = ['#00F0FF', '#A78BFA', '#10B981', '#F59E0B', '#38BDF8'];
     return {
-      id: expense.id,
-      name: expense.title,
-      category: expense.vendor || expense.category,
-      day: expense.date || 'Date not set',
+      id: item.id,
+      name: item.title,
+      category: item.category,
+      day: item.date || 'Date not set',
       position: [Math.cos(angle) * radius, Math.sin(latitude) * 1.5, Math.sin(angle) * radius],
       color: colors[index % colors.length],
-      tag: `${expense.title} · ₹${Math.round(expense.amount).toLocaleString('en-IN')}`,
+      tag: item.tag,
     };
   });
 
@@ -303,7 +323,7 @@ export const TripSphere: React.FC<{
           </span>
         </div>
         <span className="text-xs text-slate-400 hidden sm:inline">
-          {expenses.length} ledger expenses • {destination}
+          {expenses.length} expenses • {itinerary.length} itinerary items • {destination}
         </span>
       </div>
 
