@@ -181,7 +181,7 @@ export const Overview: React.FC = () => {
           </div>
 
           {/* Interactive 3D Sphere Canvas */}
-          <TripSphere destination={trip.destination || 'Trip route'} expenseCount={activeExpenses.length} />
+          <TripSphere destination={trip.destination || 'Trip route'} expenses={activeExpenses} />
         </div>
 
         {/* Right 5 cols: Upcoming Itinerary Preview */}

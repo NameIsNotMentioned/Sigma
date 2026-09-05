@@ -14,54 +14,6 @@ interface DestinationNode {
   tag: string;
 }
 
-const DESTINATION_NODES: DestinationNode[] = [
-  {
-    id: 'vagator',
-    name: 'Villa Sol Vagator',
-    category: 'Stay & Basecamp',
-    day: 'Day 1-4',
-    position: [1.3, 0.6, 0.7],
-    color: '#00F0FF', // Cyan
-    tag: 'Villa Stay',
-  },
-  {
-    id: 'panaji',
-    name: 'Fisherman\'s Wharf & Sal River',
-    category: 'Dining & Cruise',
-    day: 'Day 2',
-    position: [0.8, -0.2, 1.4],
-    color: '#A78BFA', // Violet
-    tag: 'Seafood Feast',
-  },
-  {
-    id: 'island',
-    name: 'Grand Island',
-    category: 'Ocean Scuba & Dolphins',
-    day: 'Day 2',
-    position: [0.2, -1.0, 1.2],
-    color: '#38BDF8', // Sky Blue
-    tag: 'Scuba Diving',
-  },
-  {
-    id: 'dudhsagar',
-    name: 'Dudhsagar Jungle Falls',
-    category: 'Jeep Safari Trek',
-    day: 'Day 3',
-    position: [-0.9, 0.4, 1.3],
-    color: '#10B981', // Emerald
-    tag: 'Safari Trek',
-  },
-  {
-    id: 'siolim',
-    name: 'Thalassa Siolim',
-    category: 'Sunset Farewell Drinks',
-    day: 'Day 4',
-    position: [0.5, 1.2, 0.9],
-    color: '#F59E0B', // Amber
-    tag: 'Sunset Dinner',
-  },
-];
-
 // Helper to create curved bezier 3D points elevated above sphere
 function createArcPoints(p1: [number, number, number], p2: [number, number, number], segments = 24): THREE.Vector3[] {
   const v1 = new THREE.Vector3(...p1);
@@ -164,11 +116,12 @@ const SpherePin: React.FC<{
 
 // Main Sphere Scene
 const GlobeSphere: React.FC<{
+  nodes: DestinationNode[];
   hoveredNode: DestinationNode | null;
   setHoveredNode: (node: DestinationNode | null) => void;
   setSelectedNode: (node: DestinationNode) => void;
   isPaused: boolean;
-}> = ({ hoveredNode, setHoveredNode, setSelectedNode, isPaused }) => {
+}> = ({ nodes, hoveredNode, setHoveredNode, setSelectedNode, isPaused }) => {
   const groupRef = useRef<THREE.Group>(null);
   const atmosphereRef = useRef<THREE.Mesh>(null);
 
@@ -221,30 +174,17 @@ const GlobeSphere: React.FC<{
         />
       </mesh>
 
-      {/* Route Connections between destination nodes */}
-      <RouteCurve
-        p1={DESTINATION_NODES[0].position}
-        p2={DESTINATION_NODES[1].position}
-        highlighted={hoveredNode?.id === 'vagator' || hoveredNode?.id === 'panaji'}
-      />
-      <RouteCurve
-        p1={DESTINATION_NODES[1].position}
-        p2={DESTINATION_NODES[2].position}
-        highlighted={hoveredNode?.id === 'panaji' || hoveredNode?.id === 'island'}
-      />
-      <RouteCurve
-        p1={DESTINATION_NODES[0].position}
-        p2={DESTINATION_NODES[3].position}
-        highlighted={hoveredNode?.id === 'vagator' || hoveredNode?.id === 'dudhsagar'}
-      />
-      <RouteCurve
-        p1={DESTINATION_NODES[0].position}
-        p2={DESTINATION_NODES[4].position}
-        highlighted={hoveredNode?.id === 'vagator' || hoveredNode?.id === 'siolim'}
-      />
+      {nodes.slice(1).map((node, index) => (
+        <RouteCurve
+          key={`${nodes[0]?.id ?? 'origin'}-${node.id}`}
+          p1={nodes[0]?.position ?? [0, 0, 1.5]}
+          p2={node.position}
+          highlighted={hoveredNode?.id === node.id || hoveredNode?.id === nodes[0]?.id}
+        />
+      ))}
 
       {/* Destination Nodes */}
-      {DESTINATION_NODES.map((node) => (
+      {nodes.map((node) => (
         <SpherePin
           key={node.id}
           node={node}
@@ -259,8 +199,9 @@ const GlobeSphere: React.FC<{
 
 // Graceful 2D Fallback when WebGL is unavailable or reduced-motion requested
 const Fallback2DView: React.FC<{
+  nodes: DestinationNode[];
   onSelectNode: (node: DestinationNode) => void;
-}> = ({ onSelectNode }) => {
+}> = ({ nodes, onSelectNode }) => {
   return (
     <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center">
       <div className="w-20 h-20 rounded-full border border-cyan-500/30 bg-cyan-950/20 flex items-center justify-center mb-4">
@@ -268,10 +209,10 @@ const Fallback2DView: React.FC<{
       </div>
       <h4 className="text-sm font-semibold text-slate-200 mb-1">Goa Coastal Expedition Map</h4>
       <p className="text-xs text-slate-400 mb-4 max-w-xs">
-        Interactive stops on the 4-day itinerary across North and South Goa.
+        Active expenses currently tracked for this trip.
       </p>
       <div className="grid grid-cols-2 gap-2 w-full max-w-sm">
-        {DESTINATION_NODES.map((node) => (
+        {nodes.map((node) => (
           <button
             key={node.id}
             onClick={() => onSelectNode(node)}
@@ -291,13 +232,35 @@ const Fallback2DView: React.FC<{
 
 export const TripSphere: React.FC<{
   destination?: string;
-  expenseCount?: number;
-}> = ({ destination = 'Goa, India', expenseCount = 0 }) => {
+  expenses?: Array<{
+    id: string;
+    title: string;
+    category: string;
+    date: string;
+    amount: number;
+    vendor?: string;
+  }>;
+}> = ({ destination = 'Goa, India', expenses = [] }) => {
   const [hoveredNode, setHoveredNode] = useState<DestinationNode | null>(null);
   const [selectedNode, setSelectedNode] = useState<DestinationNode | null>(null);
   const [isPaused, setIsPaused] = useState(false);
   const [webglError, setWebglError] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const nodes = expenses.map((expense, index): DestinationNode => {
+    const angle = (index / Math.max(expenses.length, 1)) * Math.PI * 2;
+    const latitude = ((index % 3) - 1) * 0.65;
+    const radius = Math.cos(latitude) * 1.5;
+    const colors = ['#00F0FF', '#A78BFA', '#10B981', '#F59E0B', '#38BDF8'];
+    return {
+      id: expense.id,
+      name: expense.title,
+      category: expense.vendor || expense.category,
+      day: expense.date || 'Date not set',
+      position: [Math.cos(angle) * radius, Math.sin(latitude) * 1.5, Math.sin(angle) * radius],
+      color: colors[index % colors.length],
+      tag: `${expense.title} · ₹${Math.round(expense.amount).toLocaleString('en-IN')}`,
+    };
+  });
 
   useEffect(() => {
     // Check prefers-reduced-motion
@@ -325,7 +288,7 @@ export const TripSphere: React.FC<{
           </span>
         </div>
         <span className="text-xs text-slate-400 hidden sm:inline">
-          {expenseCount} ledger expenses • {destination}
+          {expenses.length} ledger expenses • {destination}
         </span>
       </div>
 
@@ -337,7 +300,7 @@ export const TripSphere: React.FC<{
 
       {/* 3D Canvas / Fallback */}
       {webglError || prefersReducedMotion ? (
-        <Fallback2DView onSelectNode={(n) => setSelectedNode(n)} />
+        <Fallback2DView nodes={nodes} onSelectNode={(n) => setSelectedNode(n)} />
       ) : (
         <Suspense fallback={
           <div className="w-full h-full flex items-center justify-center text-xs text-slate-400">
@@ -359,6 +322,7 @@ export const TripSphere: React.FC<{
 
             <Float speed={1.2} rotationIntensity={0.2} floatIntensity={0.3}>
               <GlobeSphere
+                nodes={nodes}
                 hoveredNode={hoveredNode}
                 setHoveredNode={setHoveredNode}
                 setSelectedNode={setSelectedNode}
