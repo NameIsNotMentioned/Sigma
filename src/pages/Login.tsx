@@ -15,7 +15,7 @@ export const Login: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
 
   if (user) {
-    navigate('/dashboard', { replace: true });
+    navigate(searchParams.get('next') || '/dashboard', { replace: true });
     return null;
   }
 

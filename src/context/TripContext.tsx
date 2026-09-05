@@ -60,6 +60,8 @@ interface TripContextType {
 
   // Mutations
   addExpense: (expense: Omit<Expense, 'id'>) => void;
+  addParticipant: (name: string, email?: string) => void;
+  removeParticipant: (participantId: string) => void;
   updateExpense: (expense: Expense) => void;
   toggleExpenseCancel: (expenseId: string) => void;
   deleteExpense: (expenseId: string) => void;
@@ -234,6 +236,68 @@ export const TripProvider: React.FC<{ children: React.ReactNode; tripId?: string
       showToast('Expense Added', `${newExpense.title} (${formatINR(newExpense.amount)}) added to ledger.`, 'success');
     })();
   }, [isLive, showToast, tripId]);
+
+  const addParticipant = useCallback((name: string, email?: string) => {
+    const trimmedName = name.trim();
+    if (!trimmedName) return;
+    const trimmedEmail = email?.trim() || undefined;
+    const avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(trimmedName)}&background=5144c7&color=fff`;
+    if (!isLive || !tripId) {
+      setParticipants((prev) => [...prev, { id: `p-${Date.now()}`, name: trimmedName, email: trimmedEmail, avatar }]);
+      showToast('Traveler Added', `${trimmedName} joined the trip.`, 'success');
+      return;
+    }
+    void (async () => {
+      const { data, error } = await supabase.from('participants')
+        .insert({ trip_id: tripId, name: trimmedName, email: trimmedEmail ?? null })
+        .select('id')
+        .single();
+      if (error || !data) {
+        showToast('Save failed', error?.message ?? 'The traveler could not be added.', 'warning');
+        return;
+      }
+      setParticipants((prev) => [...prev, { id: data.id, name: trimmedName, email: trimmedEmail, avatar }]);
+      showToast('Traveler Added', `${trimmedName} joined the trip.`, 'success');
+    })();
+  }, [isLive, showToast, tripId]);
+
+  const removeParticipant = useCallback((participantId: string) => {
+    const participant = participants.find((item) => item.id === participantId);
+    if (!participant) return;
+    const stillOwesOrIsOwed = participantBalances.some(
+      (balance) => balance.participantId === participantId && Math.abs(balance.netBalance) > 0.5
+    );
+    if (stillOwesOrIsOwed) {
+      showToast('Cannot remove yet', `${participant.name} still has an outstanding balance — settle up first.`, 'warning');
+      return;
+    }
+
+    const previousExpenses = expenses;
+    const previousBookings = bookings;
+    setParticipants((prev) => prev.filter((item) => item.id !== participantId));
+    setExpenses((prev) => prev.map((expense) => ({
+      ...expense,
+      participantIds: expense.participantIds.filter((id) => id !== participantId),
+      paidBy: expense.paidBy === participantId ? '' : expense.paidBy,
+    })));
+    setBookings((prev) => prev.map((booking) => ({
+      ...booking,
+      participantIds: booking.participantIds.filter((id) => id !== participantId),
+      paidBy: booking.paidBy === participantId ? '' : booking.paidBy,
+    })));
+    if (selectedParticipantId === participantId) setSelectedParticipantId(null);
+    if (isLive) {
+      void supabase.from('participants').delete().eq('id', participantId).then(({ error }) => {
+        if (error) {
+          setParticipants((prev) => [...prev, participant]);
+          setExpenses(previousExpenses);
+          setBookings(previousBookings);
+          showToast('Delete failed', error.message, 'warning');
+        }
+      });
+    }
+    showToast('Traveler Removed', `${participant.name} left the trip.`, 'info');
+  }, [bookings, expenses, isLive, participantBalances, participants, selectedParticipantId, showToast]);
 
   const updateExpense = useCallback((updated: Expense) => {
     setExpenses(prev => prev.map(e => (e.id === updated.id ? updated : e)));
@@ -502,6 +566,8 @@ export const TripProvider: React.FC<{ children: React.ReactNode; tripId?: string
         optimizedTransfers,
         activeTransfers,
         addExpense,
+        addParticipant,
+        removeParticipant,
         updateExpense,
         toggleExpenseCancel,
         deleteExpense,

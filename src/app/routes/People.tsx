@@ -3,10 +3,13 @@ import { useTrip } from '../../context/TripContext';
 import { formatINR } from '../../lib/formatters';
 import { Button, Badge } from 'open-glass-ui';
 import { ParticipantDrawer } from '../../components/people/ParticipantDrawer';
-import { Users, ShieldCheck, ArrowRight, Wallet, CheckCircle2, TrendingUp } from 'lucide-react';
+import { Users, ShieldCheck, ArrowRight, Wallet, CheckCircle2, TrendingUp, Plus, Trash2 } from 'lucide-react';
 
 export const People: React.FC = () => {
-  const { participants, participantBalances, setSelectedParticipantId } = useTrip();
+  const { participants, participantBalances, setSelectedParticipantId, addParticipant, removeParticipant } = useTrip();
+  const [isAdding, setIsAdding] = useState(false);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
 
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
@@ -24,11 +27,38 @@ export const People: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-400/30 text-emerald-300 text-xs font-semibold">
-          <ShieldCheck className="w-4 h-4" />
-          <span>Conservation of Value: Net Sum = ₹0</span>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setIsAdding((current) => !current)}
+            className="px-3 py-2 rounded-xl bg-cyan-500/15 border border-cyan-400/30 text-cyan-200 text-xs font-semibold hover:bg-cyan-500/25 transition-all"
+          >
+            <Plus className="w-3.5 h-3.5 inline mr-1.5" /> Add traveler
+          </button>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-400/30 text-emerald-300 text-xs font-semibold">
+            <ShieldCheck className="w-4 h-4" />
+            <span>Conservation of Value: Net Sum = ₹0</span>
+          </div>
         </div>
       </div>
+
+      {isAdding && (
+        <form
+          className="p-4 rounded-2xl bg-white/[0.03] border border-cyan-400/20 flex flex-col sm:flex-row gap-2"
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (!name.trim()) return;
+            addParticipant(name, email);
+            setName('');
+            setEmail('');
+            setIsAdding(false);
+          }}
+        >
+          <input className="input-dark flex-1" placeholder="Traveler name" value={name} onChange={(event) => setName(event.target.value)} required />
+          <input className="input-dark flex-1" type="email" placeholder="Email (optional)" value={email} onChange={(event) => setEmail(event.target.value)} />
+          <Button type="submit" variant="primary" size="small">Add</Button>
+        </form>
+      )}
 
       {/* Grid of Participant Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -53,10 +83,21 @@ export const People: React.FC = () => {
                   className="w-12 h-12 rounded-2xl object-cover border border-white/15 group-hover:scale-105 transition-transform"
                 />
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-2">
                     <h3 className="text-sm font-bold text-white truncate group-hover:text-cyan-300 transition-colors">
                       {p.name}
                     </h3>
+                    <button
+                      type="button"
+                      aria-label={`Remove ${p.name}`}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        if (window.confirm(`Remove ${p.name} from this trip?`)) removeParticipant(p.id);
+                      }}
+                      className="w-7 h-7 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-300 hover:bg-rose-500/25 transition-all shrink-0"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                   <p className="text-xs text-cyan-400 font-medium truncate">{p.role}</p>
                   <p className="text-[11px] text-slate-400 truncate">{p.email}</p>
@@ -136,4 +177,3 @@ export const People: React.FC = () => {
     </div>
   );
 };
-
