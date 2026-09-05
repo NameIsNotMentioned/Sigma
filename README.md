@@ -1,32 +1,30 @@
-# React + TypeScript + Vite
+# GroupTrip Ledger
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Live trip itinerary, expense splitting, and settlement coordination with an interactive 3D trip globe.
 
-Currently, two official plugins are available:
+## GitHub Pages
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The site deploys automatically from the `main` branch through `.github/workflows/deploy-pages.yml`.
 
-## React Compiler
+To enable it once in GitHub:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. Open **Settings → Pages** in the repository.
+2. Set **Source** to **GitHub Actions**.
+3. Push to `main` or run the **Deploy GroupTrip Ledger to GitHub Pages** workflow manually.
 
-## Expanding the Oxlint configuration
+The site will be available at:
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+`https://nameisnotmentioned.github.io/Sigma/`
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+## Local development
+
+```bash
+npm install
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Production build
+
+```bash
+npm run build
+```
