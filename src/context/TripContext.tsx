@@ -62,10 +62,12 @@ interface TripContextType {
   addExpense: (expense: Omit<Expense, 'id'>) => void;
   updateExpense: (expense: Expense) => void;
   toggleExpenseCancel: (expenseId: string) => void;
+  deleteExpense: (expenseId: string) => void;
   setExpenseParticipants: (expenseId: string, participantIds: string[]) => void;
   addBooking: (booking: Omit<Booking, 'id'>) => void;
   updateBooking: (booking: Booking) => void;
   toggleBookingCancel: (bookingId: string) => void;
+  deleteBooking: (bookingId: string) => void;
   recordSettlementPayment: (fromId: string, toId: string, amount: number) => void;
   resetDemo: () => void;
   triggerDemoStep: (stepNumber: number) => void;
@@ -284,6 +286,21 @@ export const TripProvider: React.FC<{ children: React.ReactNode; tripId?: string
     if (isLive) void supabase.from('expenses').update({ status: nextStatus }).eq('id', expenseId);
   }, [expenses, isLive, showToast]);
 
+  const deleteExpense = useCallback((expenseId: string) => {
+    const expense = expenses.find((item) => item.id === expenseId);
+    if (!expense) return;
+    setExpenses((prev) => prev.filter((item) => item.id !== expenseId));
+    if (isLive) {
+      void supabase.from('expenses').delete().eq('id', expenseId).then(({ error }) => {
+        if (error) {
+          setExpenses((prev) => [expense, ...prev]);
+          showToast('Delete failed', error.message, 'warning');
+        }
+      });
+    }
+    showToast('Expense Deleted', `${expense.title} was removed from the ledger.`, 'info');
+  }, [expenses, isLive, showToast]);
+
   const addBooking = useCallback((newBookingData: Omit<Booking, 'id'>) => {
     if (!isLive || !tripId) {
       setBookings((prev) => [{ ...newBookingData, id: `b-${Date.now()}` }, ...prev]);
@@ -352,6 +369,22 @@ export const TripProvider: React.FC<{ children: React.ReactNode; tripId?: string
     },
     [bookings, expenses, isLive, showToast, toggleExpenseCancel]
   );
+
+  const deleteBooking = useCallback((bookingId: string) => {
+    const booking = bookings.find((item) => item.id === bookingId);
+    if (!booking) return;
+    setBookings((prev) => prev.filter((item) => item.id !== bookingId));
+    if (selectedBookingId === bookingId) setSelectedBookingId(null);
+    if (isLive) {
+      void supabase.from('bookings').delete().eq('id', bookingId).then(({ error }) => {
+        if (error) {
+          setBookings((prev) => [booking, ...prev]);
+          showToast('Delete failed', error.message, 'warning');
+        }
+      });
+    }
+    showToast('Itinerary Deleted', `${booking.title} was removed from the itinerary.`, 'info');
+  }, [bookings, isLive, selectedBookingId, showToast]);
 
   const recordSettlementPayment = useCallback(
     (fromId: string, toId: string, amount: number) => {
@@ -471,10 +504,12 @@ export const TripProvider: React.FC<{ children: React.ReactNode; tripId?: string
         addExpense,
         updateExpense,
         toggleExpenseCancel,
+        deleteExpense,
         setExpenseParticipants,
         addBooking,
         updateBooking,
         toggleBookingCancel,
+        deleteBooking,
         recordSettlementPayment,
         resetDemo,
         triggerDemoStep,

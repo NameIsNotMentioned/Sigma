@@ -15,6 +15,7 @@ import {
   Utensils,
   Plus,
   Filter,
+  Trash2,
 } from 'lucide-react';
 
 const CATEGORY_ICONS: Record<string, React.ElementType> = {
@@ -26,7 +27,7 @@ const CATEGORY_ICONS: Record<string, React.ElementType> = {
 };
 
 export const Itinerary: React.FC = () => {
-  const { bookings, participants, setSelectedBookingId, setIsAddBookingOpen } = useTrip();
+  const { bookings, participants, setSelectedBookingId, setIsAddBookingOpen, deleteBooking } = useTrip();
   const [selectedDay, setSelectedDay] = useState<string>('all');
   const [selectedParticipant, setSelectedParticipant] = useState<string>('all');
 
@@ -207,10 +208,23 @@ export const Itinerary: React.FC = () => {
                         </span>
                       </div>
 
-                      <div className="text-right">
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          aria-label={`Delete ${b.title}`}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            if (window.confirm(`Delete "${b.title}"? This cannot be undone.`)) deleteBooking(b.id);
+                          }}
+                          className="w-8 h-8 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-300 hover:bg-rose-500/25 transition-all"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                        <div className="text-right">
                         <span className={`text-xs font-bold ${isCancelled ? 'line-through text-slate-500' : 'text-cyan-400'}`}>
                           {formatINR(b.amount)}
                         </span>
+                        </div>
                       </div>
                     </div>
                   </div>

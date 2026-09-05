@@ -17,6 +17,7 @@ import {
   Sparkles,
   AlertTriangle,
   ArrowRight,
+  Trash2,
 } from 'lucide-react';
 
 const CATEGORY_ICONS: Record<string, React.ElementType> = {
@@ -34,6 +35,7 @@ export const Expenses: React.FC = () => {
     setEditingExpenseId,
     setIsAddExpenseOpen,
     totalTripCost,
+    deleteExpense,
   } = useTrip();
 
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -199,9 +201,21 @@ export const Expenses: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Arrow Indicator */}
-                  <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-slate-400 group-hover:text-white group-hover:bg-cyan-500/20 group-hover:text-cyan-300 transition-all shrink-0">
-                    <ArrowRight className="w-4 h-4" />
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      aria-label={`Delete ${exp.title}`}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        if (window.confirm(`Delete "${exp.title}"? This cannot be undone.`)) deleteExpense(exp.id);
+                      }}
+                      className="w-8 h-8 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-300 hover:bg-rose-500/25 transition-all"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                    <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-slate-400 group-hover:text-white group-hover:bg-cyan-500/20 group-hover:text-cyan-300 transition-all">
+                      <ArrowRight className="w-4 h-4" />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -216,4 +230,3 @@ export const Expenses: React.FC = () => {
     </div>
   );
 };
-

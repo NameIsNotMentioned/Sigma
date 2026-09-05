@@ -1,7 +1,8 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTrip, ActiveTab } from '../../context/TripContext';
 import { Button, Badge } from 'open-glass-ui';
-import { Plus, Calendar, Compass, Receipt, Users, ArrowLeftRight, Sparkles, Menu, Sun, Moon } from 'lucide-react';
+import { Plus, Calendar, Compass, Receipt, Users, ArrowLeftRight, Sparkles, Menu, Sun, Moon, ArrowLeft } from 'lucide-react';
 import { formatDate } from '../../lib/formatters';
 import { useAuth } from '../../context/AuthContext';
 
@@ -21,6 +22,7 @@ export const Topbar: React.FC<{
     optimizedTransfers,
   } = useTrip();
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <header className="topbar sticky top-0 z-20 border-b border-white/10 bg-[#07111F]/80 backdrop-blur-xl px-4 lg:px-8 py-3.5 flex items-center justify-between gap-4">
@@ -75,6 +77,15 @@ export const Topbar: React.FC<{
 
       {/* Right Action Buttons */}
       <div className="flex items-center gap-2.5">
+        <Button
+          variant="secondary"
+          size="small"
+          onClick={() => navigate('/dashboard')}
+          title="Back to saved trips"
+        >
+          <ArrowLeft className="w-3.5 h-3.5 mr-1.5" />
+          <span className="hidden sm:inline">Back to trips</span>
+        </Button>
         <button
           className="theme-toggle"
           onClick={onThemeToggle}
