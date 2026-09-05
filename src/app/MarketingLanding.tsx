@@ -17,6 +17,8 @@ import {
   X,
 } from 'lucide-react';
 import { useTrip } from '../context/TripContext';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { TripSphere } from '../components/dashboard/TripSphere';
 import { formatINR } from '../lib/formatters';
 
@@ -54,6 +56,8 @@ type SetupExpense = { title: string; amount: string; paidBy: number };
 
 export const MarketingLanding: React.FC<MarketingLandingProps> = ({ isDarkTheme, onThemeToggle }) => {
   const { participants, participantBalances, bookings, totalTripCost } = useTrip();
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [useCase, setUseCase] = useState(0);
   const [demoJoined, setDemoJoined] = useState(false);
@@ -104,7 +108,7 @@ export const MarketingLanding: React.FC<MarketingLandingProps> = ({ isDarkTheme,
           <button className="marketing-theme-toggle" onClick={onThemeToggle} aria-label="Toggle theme">
             {isDarkTheme ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
-          <button className="marketing-ghost" onClick={() => scrollToSection('footer')}>Sign in</button>
+          <button className="marketing-ghost" onClick={() => navigate('/login')}>{user ? 'Dashboard' : 'Sign in'}</button>
           <button className="marketing-primary header-cta" onClick={openTripSetup}>
             Start a Trip <ArrowRight className="w-4 h-4" />
           </button>
@@ -149,7 +153,7 @@ export const MarketingLanding: React.FC<MarketingLandingProps> = ({ isDarkTheme,
                   <select value={expense.paidBy} onChange={(event) => setSetupExpenses((current) => current.map((item, itemIndex) => itemIndex === index ? { ...item, paidBy: Number(event.target.value) } : item))}>{setupTravelers.map((name, travelerIndex) => <option value={travelerIndex} key={name + travelerIndex}>{name} paid</option>)}</select>
                   {setupExpenses.length > 1 && <button className="setup-remove-button" onClick={() => setSetupExpenses((current) => current.filter((_, itemIndex) => itemIndex !== index))} aria-label="Remove expense"><Trash2 className="w-4 h-4" /></button>}
                 </div>)}
-                <button className="marketing-primary setup-continue" onClick={() => setSetupOpen(false)}>Open {tripName || 'your trip'} <ArrowRight className="w-4 h-4" /></button>
+                <button className="marketing-primary setup-continue" onClick={() => { setSetupOpen(false); navigate(user ? '/dashboard' : '/login'); }}>Open {tripName || 'your trip'} <ArrowRight className="w-4 h-4" /></button>
               </div>
               <div className="trip-calculation-preview">
                 <span className="marketing-eyebrow">LIVE CALCULATION</span>
