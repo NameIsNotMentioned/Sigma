@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTrip } from '../../context/TripContext';
 import { formatINR } from '../../lib/formatters';
 import { Button, Badge } from 'open-glass-ui';
