@@ -124,6 +124,21 @@ const GlobeSphere: React.FC<{
 }> = ({ nodes, hoveredNode, setHoveredNode, setSelectedNode, isPaused }) => {
   const groupRef = useRef<THREE.Group>(null);
   const atmosphereRef = useRef<THREE.Mesh>(null);
+  const activityRoutes = useMemo(() => {
+    const nodesByActivity = new Map<string, DestinationNode[]>();
+    nodes.forEach((node) => {
+      const activityNodes = nodesByActivity.get(node.category) ?? [];
+      activityNodes.push(node);
+      nodesByActivity.set(node.category, activityNodes);
+    });
+
+    return Array.from(nodesByActivity.values()).flatMap((activityNodes) =>
+      activityNodes.slice(1).map((node, index) => ({
+        from: activityNodes[index],
+        to: node,
+      })),
+    );
+  }, [nodes]);
 
   useFrame((_, delta) => {
     if (groupRef.current && !isPaused) {
@@ -174,12 +189,12 @@ const GlobeSphere: React.FC<{
         />
       </mesh>
 
-      {nodes.slice(1).map((node, index) => (
+      {activityRoutes.map(({ from, to }) => (
         <RouteCurve
-          key={`${nodes[0]?.id ?? 'origin'}-${node.id}`}
-          p1={nodes[0]?.position ?? [0, 0, 1.5]}
-          p2={node.position}
-          highlighted={hoveredNode?.id === node.id || hoveredNode?.id === nodes[0]?.id}
+          key={`${from.id}-${to.id}`}
+          p1={from.position}
+          p2={to.position}
+          highlighted={hoveredNode?.id === to.id || hoveredNode?.id === from.id}
         />
       ))}
 

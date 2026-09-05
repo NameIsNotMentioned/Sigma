@@ -89,8 +89,8 @@ export const Overview: React.FC = () => {
               <span className="hero-orbit-dot" />
               <span>LIVE<br />LEDGER</span>
             </div>
-            <div className="hero-floating-note note-top">6 TRAVELERS</div>
-            <div className="hero-floating-note note-bottom">₹64.8K TRACKED</div>
+            <div className="hero-floating-note note-top">{participants.length} TRAVELERS</div>
+            <div className="hero-floating-note note-bottom">{formatINR(totalTripCost)} TRACKED</div>
           </div>
         </div>
 
