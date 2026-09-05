@@ -93,6 +93,17 @@ export const TripProvider: React.FC<{ children: React.ReactNode; tripId?: string
   const [currentDemoStep, setCurrentDemoStep] = useState<number>(0);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
+  const showToast = useCallback(
+    (title: string, desc?: string, tone: 'success' | 'warning' | 'info' | 'accent' = 'info') => {
+      const id = `toast-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`;
+      setToasts((prev) => [...prev.slice(-3), { id, title, desc, tone }]);
+      setTimeout(() => {
+        setToasts((prev) => prev.filter((t) => t.id !== id));
+      }, 3500);
+    },
+    []
+  );
+
   useEffect(() => {
     if (!tripId) return;
     let cancelled = false;
@@ -142,17 +153,6 @@ export const TripProvider: React.FC<{ children: React.ReactNode; tripId?: string
   const dismissToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
-
-  const showToast = useCallback(
-    (title: string, desc?: string, tone: 'success' | 'warning' | 'info' | 'accent' = 'info') => {
-      const id = `toast-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`;
-      setToasts((prev) => [...prev.slice(-3), { id, title, desc, tone }]);
-      setTimeout(() => {
-        setToasts((prev) => prev.filter((t) => t.id !== id));
-      }, 3500);
-    },
-    []
-  );
 
   // Derived Financial Metrics
   const activeExpenses = useMemo(
