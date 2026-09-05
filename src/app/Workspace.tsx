@@ -17,7 +17,7 @@ export const Workspace: React.FC<{ isDarkTheme: boolean; onThemeToggle: () => vo
   const [menuOpen, setMenuOpen] = useState(false);
   const content = activeTab === 'itinerary' ? <Itinerary /> : activeTab === 'expenses' ? <Expenses /> : activeTab === 'people' ? <People /> : activeTab === 'settlements' ? <Settlements /> : <Overview />;
 
-  return <div className="app-shell min-h-screen flex">
+  return <div className={`app-shell min-h-screen flex ${isDarkTheme ? 'theme-dark' : ''}`}>
     <Sidebar />
     <div className="flex-1 min-w-0">
       <Topbar onMenuToggle={() => setMenuOpen(true)} isDarkTheme={isDarkTheme} onThemeToggle={onThemeToggle} />

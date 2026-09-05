@@ -63,6 +63,12 @@ body {
   mask-image: linear-gradient(to bottom, black, transparent 72%);
 }
 
+/* Workspace routes do not use the landing page's scroll observer. */
+.app-shell .reveal-on-scroll {
+  opacity: 1;
+  transform: none;
+}
+
 .sidebar-glass {
   background: rgba(255, 255, 255, .58) !important;
   border-color: rgba(81, 68, 199, .14) !important;

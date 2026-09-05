@@ -289,7 +289,10 @@ const Fallback2DView: React.FC<{
   );
 };
 
-export const TripSphere: React.FC = () => {
+export const TripSphere: React.FC<{
+  destination?: string;
+  expenseCount?: number;
+}> = ({ destination = 'Goa, India', expenseCount = 0 }) => {
   const [hoveredNode, setHoveredNode] = useState<DestinationNode | null>(null);
   const [selectedNode, setSelectedNode] = useState<DestinationNode | null>(null);
   const [isPaused, setIsPaused] = useState(false);
@@ -322,7 +325,7 @@ export const TripSphere: React.FC = () => {
           </span>
         </div>
         <span className="text-xs text-slate-400 hidden sm:inline">
-          5 Waypoints • Goa, India
+          {expenseCount} ledger expenses • {destination}
         </span>
       </div>
 
@@ -342,6 +345,7 @@ export const TripSphere: React.FC = () => {
           </div>
         }>
           <Canvas
+            dpr={[1, 2]}
             camera={{ position: [0, 0, 3.8], fov: 45 }}
             onCreated={({ gl }) => {
               gl.setClearColor(0x000000, 0);
@@ -394,4 +398,3 @@ export const TripSphere: React.FC = () => {
     </div>
   );
 };
-
