@@ -65,6 +65,13 @@ const MobileMenu: React.FC<{ open: boolean; onClose: () => void }> = ({ open, on
 
 export const App: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isDarkTheme, setIsDarkTheme] = useState(() => {
+    return localStorage.getItem('triptide-theme') === 'dark';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('triptide-theme', isDarkTheme ? 'dark' : 'light');
+  }, [isDarkTheme]);
 
   useEffect(() => {
     const elements = document.querySelectorAll<HTMLElement>('.reveal-on-scroll');
@@ -88,7 +95,7 @@ export const App: React.FC = () => {
       }}
     >
       <TripProvider>
-        <div className="app-shell min-h-screen bg-[#07111F] text-slate-100 flex flex-col selection:bg-cyan-500 selection:text-slate-950">
+        <div className={`app-shell min-h-screen text-slate-100 flex flex-col selection:bg-cyan-500 selection:text-slate-950 ${isDarkTheme ? 'theme-dark' : ''}`}>
           {/* Hackathon Demo Assistant Banner */}
           <DemoGuideBar />
 
@@ -99,7 +106,11 @@ export const App: React.FC = () => {
 
             {/* Content Column */}
             <div className="flex-1 flex flex-col min-w-0">
-              <Topbar onMenuToggle={() => setMobileMenuOpen(true)} />
+              <Topbar
+                onMenuToggle={() => setMobileMenuOpen(true)}
+                isDarkTheme={isDarkTheme}
+                onThemeToggle={() => setIsDarkTheme((current) => !current)}
+              />
               <MainContent />
             </div>
           </div>

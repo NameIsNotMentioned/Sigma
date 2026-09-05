@@ -1,10 +1,14 @@
 import React from 'react';
 import { useTrip, ActiveTab } from '../../context/TripContext';
 import { Button, Badge } from 'open-glass-ui';
-import { Plus, Calendar, Compass, Receipt, Users, ArrowLeftRight, Sparkles, Menu } from 'lucide-react';
+import { Plus, Calendar, Compass, Receipt, Users, ArrowLeftRight, Sparkles, Menu, Sun, Moon } from 'lucide-react';
 import { formatDate } from '../../lib/formatters';
 
-export const Topbar: React.FC<{ onMenuToggle: () => void }> = ({ onMenuToggle }) => {
+export const Topbar: React.FC<{
+  onMenuToggle: () => void;
+  isDarkTheme: boolean;
+  onThemeToggle: () => void;
+}> = ({ onMenuToggle, isDarkTheme, onThemeToggle }) => {
   const {
     trip,
     activeTab,
@@ -67,6 +71,16 @@ export const Topbar: React.FC<{ onMenuToggle: () => void }> = ({ onMenuToggle })
 
       {/* Right Action Buttons */}
       <div className="flex items-center gap-2.5">
+        <button
+          className="theme-toggle"
+          onClick={onThemeToggle}
+          aria-label={isDarkTheme ? 'Switch to bright theme' : 'Switch to dark theme'}
+          title={isDarkTheme ? 'Switch to bright theme' : 'Switch to dark theme'}
+        >
+          {isDarkTheme ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          <span>{isDarkTheme ? 'Bright' : 'Dark'}</span>
+        </button>
+
         <Button
           variant="secondary"
           size="small"
