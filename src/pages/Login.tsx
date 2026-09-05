@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { ArrowRight, Check, Sparkles } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { isSupabaseConfigured } from '../lib/supabaseClient';
 import { useAuth } from '../context/AuthContext';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user, signIn, signUp } = useAuth();
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const [email, setEmail] = useState('');
@@ -25,11 +26,11 @@ export const Login: React.FC = () => {
     try {
       if (mode === 'signin') {
         await signIn(email, password);
-        navigate('/dashboard');
+        navigate(searchParams.get('next') || '/dashboard');
       } else {
         const needsConfirmation = await signUp(email, password);
         setMessage(needsConfirmation ? 'Account created. Check your email to confirm it, then sign in.' : 'Account created. Your dashboard is ready.');
-        if (!needsConfirmation) navigate('/dashboard');
+        if (!needsConfirmation) navigate(searchParams.get('next') || '/dashboard');
       }
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Authentication failed.');

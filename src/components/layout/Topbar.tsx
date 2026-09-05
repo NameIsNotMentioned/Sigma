@@ -17,6 +17,8 @@ export const Topbar: React.FC<{
     setIsAddExpenseOpen,
     setIsSettlementOptimized,
     isSettlementOptimized,
+    unoptimizedTransfers,
+    optimizedTransfers,
   } = useTrip();
   const { user, signOut } = useAuth();
 
@@ -30,12 +32,12 @@ export const Topbar: React.FC<{
             <h2 className="text-base font-bold text-white tracking-tight">
               {trip.name}
             </h2>
-            <Badge tone="accent">Goa, IN</Badge>
+            <Badge tone="accent">{trip.destination || 'No destination set'}</Badge>
           </div>
           <div className="flex items-center gap-2 text-xs text-slate-400">
             <Calendar className="w-3 h-3 text-cyan-400" />
             <span>
-              {formatDate(trip.startDate)} – {formatDate(trip.endDate)}
+              {trip.startDate && trip.endDate ? `${formatDate(trip.startDate)} – ${formatDate(trip.endDate)}` : 'Dates not set'}
             </span>
           </div>
         </div>
@@ -93,7 +95,7 @@ export const Topbar: React.FC<{
           className="hidden sm:inline-flex"
         >
           <Sparkles className="w-3.5 h-3.5 text-amber-400 mr-1.5" />
-          {isSettlementOptimized ? 'Show 5 Transfers' : 'Optimize (5→3)'}
+          {isSettlementOptimized ? `Show ${unoptimizedTransfers.length} Transfers` : `Optimize (${unoptimizedTransfers.length}→${optimizedTransfers.length})`}
         </Button>
 
         <span className="hidden lg:inline text-[10px] text-slate-400 max-w-[180px] truncate" title={user?.email}>{user?.email}</span>

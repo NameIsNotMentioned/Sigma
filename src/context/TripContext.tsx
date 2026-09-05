@@ -202,18 +202,35 @@ export const TripProvider: React.FC<{ children: React.ReactNode; tripId?: string
 
   // Mutations
   const addExpense = useCallback((newExpenseData: Omit<Expense, 'id'>) => {
-    const newId = `e-${Date.now()}`;
-    const newExpense: Expense = { ...newExpenseData, id: newId };
-    setExpenses(prev => [newExpense, ...prev]);
-    if (isLive && tripId) {
-      void supabase.from('expenses').insert({
-        id: newId, trip_id: tripId, description: newExpense.title, amount: newExpense.amount, paid_by: newExpense.paidBy,
-        split_method: newExpense.splitMethod, custom_shares: newExpense.customShares ?? null, status: newExpense.status === 'active' ? 'active' : newExpense.status,
-        date: newExpense.date, vendor: newExpense.vendor ?? null, notes: newExpense.notes ?? null, category: newExpense.category, booking_id: newExpense.bookingId ?? null,
-      }).then(({ error }) => { if (error) showToast('Save failed', error.message, 'warning'); });
-      void supabase.from('expense_participants').insert(newExpense.participantIds.map((participantId) => ({ expense_id: newId, participant_id: participantId })));
+    if (!isLive || !tripId) {
+      const newExpense: Expense = { ...newExpenseData, id: `e-${Date.now()}` };
+      setExpenses((prev) => [newExpense, ...prev]);
+      showToast('Expense Added', `${newExpense.title} (${formatINR(newExpense.amount)}) added to ledger.`, 'success');
+      return;
     }
-    showToast('Expense Added', `${newExpense.title} (${formatINR(newExpense.amount)}) added to ledger.`, 'success');
+    void (async () => {
+      const { data, error } = await supabase.from('expenses').insert({
+        trip_id: tripId, description: newExpenseData.title, amount: newExpenseData.amount, paid_by: newExpenseData.paidBy,
+        split_method: newExpenseData.splitMethod, custom_shares: newExpenseData.customShares ?? null,
+        status: newExpenseData.status, date: newExpenseData.date, vendor: newExpenseData.vendor ?? null,
+        notes: newExpenseData.notes ?? null, category: newExpenseData.category, booking_id: newExpenseData.bookingId ?? null,
+      }).select('id').single();
+      if (error || !data) {
+        showToast('Save failed', error?.message ?? 'The expense could not be saved.', 'warning');
+        return;
+      }
+      const { error: linkError } = await supabase.from('expense_participants').insert(
+        newExpenseData.participantIds.map((participantId) => ({ expense_id: data.id, participant_id: participantId }))
+      );
+      if (linkError) {
+        await supabase.from('expenses').delete().eq('id', data.id);
+        showToast('Save failed', linkError.message, 'warning');
+        return;
+      }
+      const newExpense: Expense = { ...newExpenseData, id: data.id };
+      setExpenses((prev) => [newExpense, ...prev]);
+      showToast('Expense Added', `${newExpense.title} (${formatINR(newExpense.amount)}) added to ledger.`, 'success');
+    })();
   }, [isLive, showToast, tripId]);
 
   const updateExpense = useCallback((updated: Expense) => {
@@ -268,55 +285,95 @@ export const TripProvider: React.FC<{ children: React.ReactNode; tripId?: string
   }, [expenses, isLive, showToast]);
 
   const addBooking = useCallback((newBookingData: Omit<Booking, 'id'>) => {
-    const newId = `b-${Date.now()}`;
-    const newBooking: Booking = { ...newBookingData, id: newId };
-    setBookings(prev => [newBooking, ...prev]);
-    if (isLive && tripId) {
-      void supabase.from('bookings').insert({ id: newId, trip_id: tripId, title: newBooking.title, category: newBooking.category, vendor: newBooking.vendor ?? null, date: newBooking.date, time: newBooking.time ?? null, amount: newBooking.amount, paid_by: newBooking.paidBy, status: newBooking.status, location: newBooking.location ?? null, notes: newBooking.notes ?? null });
-      void supabase.from('booking_participants').insert(newBooking.participantIds.map((participantId) => ({ booking_id: newId, participant_id: participantId })));
+    if (!isLive || !tripId) {
+      setBookings((prev) => [{ ...newBookingData, id: `b-${Date.now()}` }, ...prev]);
+      return;
     }
-  }, [isLive, tripId]);
+    void (async () => {
+      const { data, error } = await supabase.from('bookings').insert({
+        trip_id: tripId, title: newBookingData.title, category: newBookingData.category,
+        vendor: newBookingData.vendor ?? null, date: newBookingData.date, time: newBookingData.time ?? null,
+        amount: newBookingData.amount, paid_by: newBookingData.paidBy, status: newBookingData.status,
+        location: newBookingData.location ?? null, notes: newBookingData.notes ?? null,
+      }).select('id').single();
+      if (error || !data) {
+        showToast('Save failed', error?.message ?? 'The booking could not be saved.', 'warning');
+        return;
+      }
+      const { error: linkError } = await supabase.from('booking_participants').insert(
+        newBookingData.participantIds.map((participantId) => ({ booking_id: data.id, participant_id: participantId }))
+      );
+      if (linkError) {
+        await supabase.from('bookings').delete().eq('id', data.id);
+        showToast('Save failed', linkError.message, 'warning');
+        return;
+      }
+      setBookings((prev) => [{ ...newBookingData, id: data.id }, ...prev]);
+      showToast('Booking Added', `${newBookingData.title} was added to the itinerary.`, 'success');
+    })();
+  }, [isLive, showToast, tripId]);
 
   const updateBooking = useCallback((updated: Booking) => {
+    const previous = bookings.find((booking) => booking.id === updated.id);
     setBookings(prev => prev.map(b => (b.id === updated.id ? updated : b)));
-  }, []);
+    if (isLive) {
+      void supabase.from('bookings').update({
+        title: updated.title, category: updated.category, vendor: updated.vendor ?? null, date: updated.date,
+        time: updated.time ?? null, amount: updated.amount, paid_by: updated.paidBy, status: updated.status,
+        location: updated.location ?? null, notes: updated.notes ?? null,
+      }).eq('id', updated.id).then(({ error }) => {
+        if (error) {
+          if (previous) setBookings((current) => current.map((booking) => booking.id === updated.id ? previous : booking));
+          showToast('Save failed', error.message, 'warning');
+        }
+      });
+    }
+  }, [bookings, isLive, showToast]);
 
   const toggleBookingCancel = useCallback(
     (bookingId: string) => {
-      setBookings(prev =>
-        prev.map(b => {
-          if (b.id === bookingId) {
-            const nextStatus = b.status === 'cancelled' ? 'confirmed' : 'cancelled';
-            return { ...b, status: nextStatus };
+      const booking = bookings.find((item) => item.id === bookingId);
+      if (!booking) return;
+      const nextStatus = booking.status === 'cancelled' ? 'confirmed' : 'cancelled';
+      setBookings(prev => prev.map(b => (b.id === bookingId ? { ...b, status: nextStatus } : b)));
+      if (isLive) {
+        void supabase.from('bookings').update({ status: nextStatus }).eq('id', bookingId).then(({ error }) => {
+          if (error) {
+            setBookings((prev) => prev.map((item) => item.id === bookingId ? booking : item));
+            showToast('Save failed', error.message, 'warning');
           }
-          return b;
-        })
-      );
+        });
+      }
       // Also sync linked expense if any
       const matchingExpense = expenses.find(e => e.bookingId === bookingId);
       if (matchingExpense) {
         toggleExpenseCancel(matchingExpense.id);
       }
     },
-    [expenses, toggleExpenseCancel]
+    [bookings, expenses, isLive, showToast, toggleExpenseCancel]
   );
 
   const recordSettlementPayment = useCallback(
     (fromId: string, toId: string, amount: number) => {
       const debtor = participants.find(p => p.id === fromId);
       const creditor = participants.find(p => p.id === toId);
-      const payment: Payment = {
-        id: `pay-${Date.now()}`,
-        expenseId: expenses[0]?.id || 'settlement',
-        paidBy: fromId,
-        amount,
-        date: new Date().toISOString().split('T')[0],
-        note: `Settled transfer to ${creditor?.name}`,
-      };
-      setPayments(prev => [...prev, payment]);
+      const note = `Settled transfer to ${creditor?.name}`;
+      if (isLive && tripId) {
+        void supabase.from('payments').insert({ trip_id: tripId, from_participant: fromId, to_participant: toId, amount, note })
+          .select('id,created_at').single().then(({ data, error }) => {
+            if (error || !data) {
+              showToast('Save failed', error?.message ?? 'The settlement could not be saved.', 'warning');
+              return;
+            }
+            setPayments((prev) => [...prev, { id: data.id, expenseId: 'settlement', paidBy: fromId, amount, date: data.created_at.slice(0, 10), note }]);
+            showToast('Settlement Recorded', `${debtor?.name} paid ${formatINR(amount)} to ${creditor?.name}.`, 'success');
+          });
+        return;
+      }
+      setPayments((prev) => [...prev, { id: `pay-${Date.now()}`, expenseId: expenses[0]?.id || 'settlement', paidBy: fromId, amount, date: new Date().toISOString().split('T')[0], note }]);
       showToast('Settlement Recorded', `${debtor?.name} paid ${formatINR(amount)} to ${creditor?.name}.`, 'success');
     },
-    [expenses, participants, showToast]
+    [expenses, isLive, participants, showToast, tripId]
   );
 
   const resetDemo = useCallback(() => {

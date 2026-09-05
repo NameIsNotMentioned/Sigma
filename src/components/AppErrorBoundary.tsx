@@ -17,7 +17,7 @@ export class AppErrorBoundary extends React.Component<React.PropsWithChildren, S
           <span className="marketing-eyebrow">WORKSPACE ERROR</span>
           <h1>We couldn’t open this trip.</h1>
           <p>{this.state.error.message}</p>
-          <button className="marketing-primary" onClick={() => window.location.hash = '#/dashboard'}>Back to trips</button>
+          <button className="marketing-primary" onClick={() => { this.setState({ error: null }); window.location.hash = '#/dashboard'; }}>Back to trips</button>
         </div>
       </main>
     );

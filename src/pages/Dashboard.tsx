@@ -16,6 +16,8 @@ export const Dashboard: React.FC<{ isDarkTheme: boolean; onThemeToggle: () => vo
   const [trips, setTrips] = useState<TripRow[]>([]);
   const [name, setName] = useState('');
   const [destination, setDestination] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
   const tripId = searchParams.get('trip');
@@ -40,7 +42,7 @@ export const Dashboard: React.FC<{ isDarkTheme: boolean; onThemeToggle: () => vo
     const tripName = name.trim() || draft?.name?.trim() || '';
     if (!user || !tripName) return;
     setBusy(true); setMessage('');
-    const { data, error } = await supabase.from('trips').insert({ owner_id: user.id, name: tripName, destination: destination.trim() || null }).select().single();
+    const { data, error } = await supabase.from('trips').insert({ owner_id: user.id, name: tripName, destination: destination.trim() || null, start_date: startDate || null, end_date: endDate || null }).select().single();
     if (error) setMessage(error.message);
     else if (data) {
       const travelers = draft?.travelers ?? [];
@@ -71,7 +73,7 @@ export const Dashboard: React.FC<{ isDarkTheme: boolean; onThemeToggle: () => vo
       <div className="data-heading"><div><span className="marketing-eyebrow">PRIVATE WORKSPACE</span><h1>Your saved trips.</h1><p>Choose a trip to open the full live ledger workspace.</p></div></div>
       {message && <div className="auth-message">{message}</div>}
       <div className="data-grid">
-        <section className="data-panel glass-panel"><h2>Create a trip</h2><form onSubmit={createTrip}><input placeholder="Trip name" value={name || draft?.name || ''} onChange={(event) => setName(event.target.value)} required /><input placeholder="Destination (optional)" value={destination} onChange={(event) => setDestination(event.target.value)} /><button className="marketing-primary" disabled={busy}><Plus className="w-4 h-4" /> Save trip</button></form>{draft && <p className="empty-state">Your setup draft includes {draft.travelers?.length ?? 0} travelers and {draft.expenses?.length ?? 0} expenses. They will be saved with this trip.</p>}</section>
+        <section className="data-panel glass-panel"><h2>Create a trip</h2><form onSubmit={createTrip}><input placeholder="Trip name" value={name || draft?.name || ''} onChange={(event) => setName(event.target.value)} required /><input placeholder="Destination (optional)" value={destination} onChange={(event) => setDestination(event.target.value)} /><div className="date-fields"><label>Start date<input type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} /></label><label>End date<input type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} /></label></div><button className="marketing-primary" disabled={busy}><Plus className="w-4 h-4" /> Save trip</button></form>{draft && <p className="empty-state">Your setup draft includes {draft.travelers?.length ?? 0} travelers and {draft.expenses?.length ?? 0} expenses. They will be saved with this trip.</p>}</section>
         <section className="data-panel glass-panel"><span className="marketing-eyebrow">YOUR TRIPS</span><h2>Open a ledger</h2><div className="trip-list">{trips.map((trip) => <button className="trip-list-row" key={trip.id} onClick={() => navigate(`/dashboard?trip=${trip.id}`)}><strong>{trip.name}</strong><span>{trip.destination || 'No destination yet'} <ArrowRight className="inline w-3 h-3" /></span></button>)}{trips.length === 0 && <p className="empty-state">Create your first trip to get started.</p>}</div></section>
       </div>
     </div>

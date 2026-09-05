@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Sidebar } from '../components/layout/Sidebar';
 import { Topbar } from '../components/layout/Topbar';
 import { AddExpenseModal } from '../components/expenses/AddExpenseModal';
+import { AddBookingModal } from '../components/itinerary/AddBookingModal';
 import { BookingDrawer } from '../components/itinerary/BookingDrawer';
 import { ParticipantDrawer } from '../components/people/ParticipantDrawer';
 import { useTrip } from '../context/TripContext';
@@ -12,7 +13,7 @@ import { People } from './routes/People';
 import { Settlements } from './routes/Settlements';
 
 export const Workspace: React.FC<{ isDarkTheme: boolean; onThemeToggle: () => void }> = ({ isDarkTheme, onThemeToggle }) => {
-  const { activeTab, isAddExpenseOpen, setIsAddExpenseOpen, selectedBookingId, setSelectedBookingId, selectedParticipantId, setSelectedParticipantId } = useTrip();
+  const { activeTab, isAddExpenseOpen, isAddBookingOpen, selectedBookingId, selectedParticipantId } = useTrip();
   const [menuOpen, setMenuOpen] = useState(false);
   const content = activeTab === 'itinerary' ? <Itinerary /> : activeTab === 'expenses' ? <Expenses /> : activeTab === 'people' ? <People /> : activeTab === 'settlements' ? <Settlements /> : <Overview />;
 
@@ -24,6 +25,7 @@ export const Workspace: React.FC<{ isDarkTheme: boolean; onThemeToggle: () => vo
     </div>
     {menuOpen && <div className="mobile-menu-backdrop" onClick={() => setMenuOpen(false)}><div className="mobile-menu-panel" onClick={(event) => event.stopPropagation()}><button className="mobile-menu-close" onClick={() => setMenuOpen(false)}>×</button><Sidebar /></div></div>}
     {isAddExpenseOpen && <AddExpenseModal />}
+    {isAddBookingOpen && <AddBookingModal />}
     {selectedBookingId && <BookingDrawer />}
     {selectedParticipantId && <ParticipantDrawer />}
   </div>;

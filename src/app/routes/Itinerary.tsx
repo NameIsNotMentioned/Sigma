@@ -26,7 +26,7 @@ const CATEGORY_ICONS: Record<string, React.ElementType> = {
 };
 
 export const Itinerary: React.FC = () => {
-  const { bookings, participants, setSelectedBookingId, setIsAddExpenseOpen } = useTrip();
+  const { bookings, participants, setSelectedBookingId, setIsAddBookingOpen } = useTrip();
   const [selectedDay, setSelectedDay] = useState<string>('all');
   const [selectedParticipant, setSelectedParticipant] = useState<string>('all');
 
@@ -68,7 +68,7 @@ export const Itinerary: React.FC = () => {
         <Button
           variant="primary"
           size="medium"
-          onClick={() => setIsAddExpenseOpen(true)}
+          onClick={() => setIsAddBookingOpen(true)}
         >
           <Plus className="w-4 h-4 mr-1.5" />
           Add Schedule Item
@@ -226,4 +226,3 @@ export const Itinerary: React.FC = () => {
     </div>
   );
 };
-
