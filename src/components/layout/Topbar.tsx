@@ -16,6 +16,7 @@ export const Topbar: React.FC<{
     activeTab,
     setActiveTab,
     setIsAddExpenseOpen,
+    setIsAddParticipantOpen,
     setIsSettlementOptimized,
     isSettlementOptimized,
     unoptimizedTransfers,
@@ -113,6 +114,16 @@ export const Topbar: React.FC<{
         <button className="menu-chip flex" onClick={onMenuToggle} aria-label="Open trip menu">
         <Menu className="w-4 h-4" />
         </button>
+
+        <Button
+          variant="primary"
+          size="small"
+          onClick={() => { setActiveTab('people'); setIsAddParticipantOpen(true); }}
+          className="hidden sm:inline-flex"
+        >
+          <Users className="w-3.5 h-3.5 mr-1.5" />
+          Add people
+        </Button>
 
         <Button
           variant="primary"

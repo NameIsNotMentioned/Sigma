@@ -6,8 +6,7 @@ import { ParticipantDrawer } from '../../components/people/ParticipantDrawer';
 import { Users, ShieldCheck, ArrowRight, Wallet, CheckCircle2, TrendingUp, Plus, Trash2 } from 'lucide-react';
 
 export const People: React.FC = () => {
-  const { participants, participantBalances, setSelectedParticipantId, addParticipant, removeParticipant } = useTrip();
-  const [isAdding, setIsAdding] = useState(false);
+  const { participants, participantBalances, setSelectedParticipantId, addParticipant, removeParticipant, isAddParticipantOpen: isAdding, setIsAddParticipantOpen: setIsAdding } = useTrip();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
 
@@ -30,7 +29,7 @@ export const People: React.FC = () => {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => setIsAdding((current) => !current)}
+            onClick={() =>             setIsAdding(!isAdding)}
             className="px-3 py-2 rounded-xl bg-cyan-500/15 border border-cyan-400/30 text-cyan-200 text-xs font-semibold hover:bg-cyan-500/25 transition-all"
           >
             <Plus className="w-3.5 h-3.5 inline mr-1.5" /> Add traveler

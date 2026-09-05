@@ -62,6 +62,8 @@ interface TripContextType {
   addExpense: (expense: Omit<Expense, 'id'>) => void;
   addParticipant: (name: string, email?: string) => void;
   removeParticipant: (participantId: string) => void;
+  isAddParticipantOpen: boolean;
+  setIsAddParticipantOpen: (open: boolean) => void;
   updateExpense: (expense: Expense) => void;
   toggleExpenseCancel: (expenseId: string) => void;
   deleteExpense: (expenseId: string) => void;
@@ -93,6 +95,7 @@ export const TripProvider: React.FC<{ children: React.ReactNode; tripId?: string
   const [editingExpenseId, setEditingExpenseId] = useState<string | null>(null);
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState<boolean>(false);
   const [isAddBookingOpen, setIsAddBookingOpen] = useState<boolean>(false);
+  const [isAddParticipantOpen, setIsAddParticipantOpen] = useState<boolean>(false);
   const [isSettlementOptimized, setIsSettlementOptimized] = useState<boolean>(false);
   const [currentDemoStep, setCurrentDemoStep] = useState<number>(0);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
@@ -568,6 +571,8 @@ export const TripProvider: React.FC<{ children: React.ReactNode; tripId?: string
         addExpense,
         addParticipant,
         removeParticipant,
+        isAddParticipantOpen,
+        setIsAddParticipantOpen,
         updateExpense,
         toggleExpenseCancel,
         deleteExpense,

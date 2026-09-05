@@ -20,7 +20,7 @@ interface NavItem {
 }
 
 export const Sidebar: React.FC = () => {
-  const { activeTab, setActiveTab, trip, participants, setSelectedParticipantId, unoptimizedTransfers, optimizedTransfers } = useTrip();
+  const { activeTab, setActiveTab, trip, participants, setSelectedParticipantId, setIsAddParticipantOpen, unoptimizedTransfers, optimizedTransfers } = useTrip();
   const navItems: NavItem[] = [
     { id: 'overview', label: 'Overview', icon: Compass },
     { id: 'itinerary', label: 'Itinerary', icon: Calendar },
@@ -119,12 +119,22 @@ export const Sidebar: React.FC = () => {
               <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
                 Travelers ({participants.length})
               </span>
-              <button
-                onClick={() => setActiveTab('people')}
-                className="text-[10px] text-cyan-400 hover:underline"
-              >
-                View all
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => { setActiveTab('people'); setIsAddParticipantOpen(true); }}
+                  className="text-[10px] text-cyan-400 hover:underline"
+                >
+                  View all
+                </button>
+                <button
+                  onClick={() => setActiveTab('people')}
+                  className="w-5 h-5 rounded-full bg-cyan-500/15 border border-cyan-400/30 text-cyan-300 flex items-center justify-center hover:bg-cyan-500/25"
+                  aria-label="Add people"
+                  title="Add people"
+                >
+                  <span className="text-sm leading-none">+</span>
+                </button>
+              </div>
             </div>
 
             <div className="flex items-center -space-x-2 overflow-hidden px-1 py-1">
