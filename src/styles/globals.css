@@ -568,12 +568,12 @@ body {
 }
 .marketing-brand { display: inline-flex; align-items: center; gap: 9px; color: var(--marketing-ink); font-size: 15px; font-weight: 500; }
 .logo-brand { display: inline-flex; align-items: center; justify-content: center; padding: 0; background: transparent; border: none; cursor: pointer; }
-.brand-logo { display: inline-flex; align-items: center; height: 100px; }
-.brand-logo-image { display: block; width: clamp(250px, 32vw, 400px); height: 100px; object-fit: contain; object-position: left center; }
+.brand-logo { display: inline-flex; align-items: center; height: 48px; }
+.brand-logo-image { display: block; width: 48px; height: 48px; object-fit: contain; object-position: center; }
 .brand-logo.is-light .brand-logo-image { mix-blend-mode: multiply; filter: drop-shadow(0 0 10px rgba(255, 122, 70, 0.12)); }
 .brand-logo.is-dark .brand-logo-image { mix-blend-mode: screen; filter: drop-shadow(0 0 16px rgba(122, 61, 255, 0.28)); }
-.brand-logo-compact { height: 56px; }
-.brand-logo-compact .brand-logo-image { width: 220px; height: 56px; }
+.brand-logo-compact { height: 36px; }
+.brand-logo-compact .brand-logo-image { width: 36px; height: 36px; }
 .marketing-brand b { font-weight: 800; }
 .marketing-brand-mark { display: grid; width: 30px; height: 30px; place-items: center; color: #fff; border-radius: 10px; background: linear-gradient(145deg, #5543c8, #a65fe7); box-shadow: 0 8px 18px rgba(91, 69, 199, .25); }
 .marketing-nav { display: flex; align-items: center; gap: 28px; margin-left: auto; }
