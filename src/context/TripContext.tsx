@@ -150,7 +150,7 @@ export const TripProvider: React.FC<{ children: React.ReactNode; tripId?: string
         setBookings((bookingRows ?? []).map((booking) => ({
           id: booking.id, title: booking.title, category: booking.category ?? 'other', vendor: booking.vendor ?? '', date: booking.date ?? '', time: booking.time ?? undefined, amount: Number(booking.amount), participantIds: (bookingLinks ?? []).filter((link) => link.booking_id === booking.id).map((link) => link.participant_id), paidBy: booking.paid_by ?? mappedParticipants[0]?.id ?? '', status: booking.status ?? 'confirmed', location: booking.location ?? undefined, notes: booking.notes ?? undefined,
         })));
-        setPayments((paymentRows ?? []).map((payment) => ({ id: payment.id, expenseId: 'settlement', paidBy: payment.from_participant, amount: Number(payment.amount), date: payment.created_at?.slice(0, 10) ?? '', note: payment.note ?? undefined })));
+        setPayments((paymentRows ?? []).map((payment) => ({ id: payment.id, expenseId: 'settlement', paidBy: payment.from_participant, paidTo: payment.to_participant, amount: Number(payment.amount), date: payment.created_at?.slice(0, 10) ?? '', note: payment.note ?? undefined })));
       }
     };
     void loadLiveTrip().catch((error: unknown) => showToast('Trip load failed', error instanceof Error ? error.message : 'Could not load trip data.', 'warning'));
@@ -274,6 +274,13 @@ export const TripProvider: React.FC<{ children: React.ReactNode; tripId?: string
       showToast('Cannot remove yet', `${participant.name} still has an outstanding balance — settle up first.`, 'warning');
       return;
     }
+    const hasSettlementHistory = payments.some(
+      (payment) => payment.paidBy === participantId || payment.paidTo === participantId
+    );
+    if (hasSettlementHistory) {
+      showToast('Cannot remove yet', `${participant.name} has settlement payment history that must be preserved.`, 'warning');
+      return;
+    }
 
     const previousExpenses = expenses;
     const previousBookings = bookings;
@@ -300,7 +307,7 @@ export const TripProvider: React.FC<{ children: React.ReactNode; tripId?: string
       });
     }
     showToast('Traveler Removed', `${participant.name} left the trip.`, 'info');
-  }, [bookings, expenses, isLive, participantBalances, participants, selectedParticipantId, showToast]);
+  }, [bookings, expenses, isLive, participantBalances, participants, payments, selectedParticipantId, showToast]);
 
   const updateExpense = useCallback((updated: Expense) => {
     setExpenses(prev => prev.map(e => (e.id === updated.id ? updated : e)));
@@ -465,12 +472,12 @@ export const TripProvider: React.FC<{ children: React.ReactNode; tripId?: string
               showToast('Save failed', error?.message ?? 'The settlement could not be saved.', 'warning');
               return;
             }
-            setPayments((prev) => [...prev, { id: data.id, expenseId: 'settlement', paidBy: fromId, amount, date: data.created_at.slice(0, 10), note }]);
+            setPayments((prev) => [...prev, { id: data.id, expenseId: 'settlement', paidBy: fromId, paidTo: toId, amount, date: data.created_at.slice(0, 10), note }]);
             showToast('Settlement Recorded', `${debtor?.name} paid ${formatINR(amount)} to ${creditor?.name}.`, 'success');
           });
         return;
       }
-      setPayments((prev) => [...prev, { id: `pay-${Date.now()}`, expenseId: expenses[0]?.id || 'settlement', paidBy: fromId, amount, date: new Date().toISOString().split('T')[0], note }]);
+      setPayments((prev) => [...prev, { id: `pay-${Date.now()}`, expenseId: expenses[0]?.id || 'settlement', paidBy: fromId, paidTo: toId, amount, date: new Date().toISOString().split('T')[0], note }]);
       showToast('Settlement Recorded', `${debtor?.name} paid ${formatINR(amount)} to ${creditor?.name}.`, 'success');
     },
     [expenses, isLive, participants, showToast, tripId]

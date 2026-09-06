@@ -27,6 +27,7 @@ export type Payment = {
   id: string;
   expenseId: string;
   paidBy: string;
+  paidTo?: string;
   amount: number;
   date: string;
   note?: string;
@@ -76,4 +77,3 @@ export type ParticipantBalance = {
   netBalance: number; // positive = gets back money (creditor), negative = owes money (debtor)
   activitiesJoined: number;
 };
-

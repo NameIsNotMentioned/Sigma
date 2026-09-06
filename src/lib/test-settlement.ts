@@ -119,5 +119,30 @@ assert(
 const sumNet = balances.reduce((sum, b) => sum + b.netBalance, 0);
 assert(Math.abs(sumNet) < 1e-6, `Net sum across all participants is 0 (got ${sumNet})`);
 
-console.log('\nAll Settlement Engine Tests Passed Successfully!');
+const settlementExpense: Expense = {
+  id: 'settlement-expense',
+  title: 'Shared dinner',
+  category: 'food',
+  amount: 1000,
+  paidBy: 'u1',
+  participantIds: ['u1', 'u2'],
+  splitMethod: 'equal',
+  status: 'active',
+  date: '2026-10-14',
+};
+const settledBalances = calculateBalances(participants.slice(0, 2), [settlementExpense], [{
+  id: 'payment-1',
+  expenseId: 'settlement',
+  paidBy: 'u2',
+  paidTo: 'u1',
+  amount: 500,
+  date: '2026-10-14',
+}]);
+const settledPayer = settledBalances.find((balance) => balance.participantId === 'u2');
+const settledRecipient = settledBalances.find((balance) => balance.participantId === 'u1');
+const settledSumNet = settledBalances.reduce((sum, balance) => sum + balance.netBalance, 0);
+assert(settledPayer?.netBalance === 0, 'Settlement payment clears the payer balance by the transferred amount');
+assert(settledRecipient?.netBalance === 0, 'Settlement payment credits the recipient by the transferred amount');
+assert(Math.abs(settledSumNet) < 1e-6, `Net sum remains zero after settlement (got ${settledSumNet})`);
 
+console.log('\nAll Settlement Engine Tests Passed Successfully!');

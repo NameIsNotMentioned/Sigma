@@ -94,7 +94,11 @@ export function calculateBalances(
 
   for (const payment of payments) {
     directPaid[payment.paidBy] = (directPaid[payment.paidBy] ?? 0) + payment.amount;
-    // If payment belongs to a specific expense, credit the original payer
+    if (payment.paidTo) {
+      directReceived[payment.paidTo] = (directReceived[payment.paidTo] ?? 0) + payment.amount;
+      continue;
+    }
+    // Backward compatibility for expense-reimbursement payment records.
     const matchingExpense = expenses.find(e => e.id === payment.expenseId);
     if (matchingExpense) {
       directReceived[matchingExpense.paidBy] =
@@ -248,4 +252,3 @@ export function optimizeSettlements(balances: ParticipantBalance[]): Transfer[] 
 
   return transfers;
 }
-
