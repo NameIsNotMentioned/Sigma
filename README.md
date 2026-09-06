@@ -1,4 +1,4 @@
-# GroupTrip Ledger
+# Unpack
 
 Live trip itinerary, expense splitting, and settlement coordination with an interactive 3D trip globe.
 
@@ -10,7 +10,7 @@ To enable it once in GitHub:
 
 1. Open **Settings → Pages** in the repository.
 2. Set **Source** to **GitHub Actions**.
-3. Push to `main` or run the **Deploy GroupTrip Ledger to GitHub Pages** workflow manually.
+3. Push to `main` or run the **Deploy Unpack to GitHub Pages** workflow manually.
 
 The site will be available at:
 
