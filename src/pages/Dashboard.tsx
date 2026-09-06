@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowRight, LogOut, Plus, Sparkles } from 'lucide-react';
+import { ArrowRight, LogOut, Plus } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../context/AuthContext';
 import { TripProvider } from '../context/TripContext';
 import { Workspace } from '../app/Workspace';
+import { BrandLogo } from '../components/BrandLogo';
 
 type TripRow = { id: string; name: string; destination: string | null; created_at: string };
 type TripDraft = { name?: string; travelers?: string[]; expenses?: { title: string; amount: string; paidBy: number }[] };
@@ -67,8 +68,8 @@ export const Dashboard: React.FC<{ isDarkTheme: boolean; onThemeToggle: () => vo
     setBusy(false);
   };
 
-  return <main className="data-page">
-    <header className="data-header"><button className="marketing-brand" onClick={() => navigate('/')}><span className="marketing-brand-mark"><Sparkles className="w-4 h-4" /></span><span>GroupTrip <b>Ledger</b></span></button><button className="data-signout" onClick={() => void signOut()}><LogOut className="w-4 h-4" /> Sign out</button></header>
+  return <div className={isDarkTheme ? 'theme-dark' : undefined}><main className="data-page">
+    <header className="data-header"><button className="marketing-brand logo-brand" onClick={() => navigate('/')} aria-label="Go to homepage"><BrandLogo isDarkTheme={isDarkTheme} /></button><button className="data-signout" onClick={() => void signOut()}><LogOut className="w-4 h-4" /> Sign out</button></header>
     <div className="data-container">
       <div className="data-heading"><div><span className="marketing-eyebrow">PRIVATE WORKSPACE</span><h1>Your saved trips.</h1><p>Choose a trip to open the full live ledger workspace.</p></div></div>
       {message && <div className="auth-message">{message}</div>}
@@ -77,5 +78,5 @@ export const Dashboard: React.FC<{ isDarkTheme: boolean; onThemeToggle: () => vo
         <section className="data-panel glass-panel"><span className="marketing-eyebrow">YOUR TRIPS</span><h2>Open a ledger</h2><div className="trip-list">{trips.map((trip) => <button className="trip-list-row" key={trip.id} onClick={() => navigate(`/dashboard?trip=${trip.id}`)}><strong>{trip.name}</strong><span>{trip.destination || 'No destination yet'} <ArrowRight className="inline w-3 h-3" /></span></button>)}{trips.length === 0 && <p className="empty-state">Create your first trip to get started.</p>}</div></section>
       </div>
     </div>
-  </main>;
+  </main></div>;
 };

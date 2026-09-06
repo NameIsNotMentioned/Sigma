@@ -19,12 +19,12 @@ export const Workspace: React.FC<{ isDarkTheme: boolean; onThemeToggle: () => vo
 
   return <div className={isDarkTheme ? 'theme-dark' : undefined}>
     <div className="app-shell min-h-screen flex">
-      <Sidebar />
+      <Sidebar isDarkTheme={isDarkTheme} />
       <div className="flex-1 min-w-0">
         <Topbar onMenuToggle={() => setMenuOpen(true)} isDarkTheme={isDarkTheme} onThemeToggle={onThemeToggle} />
         <main className="p-4 lg:p-8 max-w-[1600px] mx-auto">{content}</main>
       </div>
-      {menuOpen && <div className="mobile-menu-backdrop" onClick={() => setMenuOpen(false)}><div className="mobile-menu-panel" onClick={(event) => event.stopPropagation()}><button className="mobile-menu-close" onClick={() => setMenuOpen(false)}>×</button><Sidebar /></div></div>}
+      {menuOpen && <div className="mobile-menu-backdrop" onClick={() => setMenuOpen(false)}><div className="mobile-menu-panel" onClick={(event) => event.stopPropagation()}><button className="mobile-menu-close" onClick={() => setMenuOpen(false)}>×</button><Sidebar isDarkTheme={isDarkTheme} /></div></div>}
       {isAddExpenseOpen && <AddExpenseModal />}
       {isAddBookingOpen && <AddBookingModal />}
       {selectedBookingId && <BookingDrawer />}

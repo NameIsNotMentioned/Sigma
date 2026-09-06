@@ -7,10 +7,10 @@ import {
   Receipt,
   Users,
   ArrowLeftRight,
-  Sparkles,
   MapPin,
   ShieldCheck,
 } from 'lucide-react';
+import { BrandLogo } from '../BrandLogo';
 
 interface NavItem {
   id: ActiveTab;
@@ -19,7 +19,7 @@ interface NavItem {
   badge?: string;
 }
 
-export const Sidebar: React.FC = () => {
+export const Sidebar: React.FC<{ isDarkTheme?: boolean }> = ({ isDarkTheme = true }) => {
   const { activeTab, setActiveTab, trip, participants, setSelectedParticipantId, setIsAddParticipantOpen, unoptimizedTransfers, optimizedTransfers } = useTrip();
   const navItems: NavItem[] = [
     { id: 'overview', label: 'Overview', icon: Compass },
@@ -45,19 +45,7 @@ export const Sidebar: React.FC = () => {
           {/* Top Brand & Trip Identity */}
           <div className="space-y-6">
             {/* Logo */}
-            <div className="flex items-center gap-3">
-              <div className="brand-mark w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/25">
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h1 className="font-bold text-sm tracking-tight text-white flex items-center gap-1.5">
-                  TripTide
-                </h1>
-                <p className="text-[10px] text-cyan-400 font-medium tracking-wide uppercase">
-                  SMART TRAVEL LEDGER
-                </p>
-              </div>
-            </div>
+            <BrandLogo isDarkTheme={isDarkTheme} compact />
 
             {/* Current Trip Card */}
             <div className="p-3 rounded-xl bg-white/5 border border-white/10 space-y-1.5">

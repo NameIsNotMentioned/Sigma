@@ -10,7 +10,6 @@ import {
   Moon,
   Plus,
   Receipt,
-  Sparkles,
   Sun,
   Trash2,
   Users,
@@ -21,6 +20,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { TripSphere } from '../components/dashboard/TripSphere';
 import { formatINR } from '../lib/formatters';
+import { BrandLogo } from '../components/BrandLogo';
 
 interface MarketingLandingProps {
   isDarkTheme: boolean;
@@ -96,13 +96,11 @@ export const MarketingLanding: React.FC<MarketingLandingProps> = ({ isDarkTheme,
 
   const demoTotal = demoJoined ? totalTripCost + 1500 : totalTripCost;
   const demoShare = Math.round(demoTotal / (participants.length + (demoJoined ? 1 : 0)));
-
   return (
     <div className={`marketing-site ${isDarkTheme ? 'theme-dark' : ''}`}>
       <header className="marketing-header">
-        <button className="marketing-brand" onClick={() => scrollToSection('home')} aria-label="Go to top">
-          <span className="marketing-brand-mark"><Sparkles className="w-4 h-4" /></span>
-          <span>GroupTrip <b>Ledger</b></span>
+        <button className="marketing-brand logo-brand" onClick={() => scrollToSection('home')} aria-label="Go to top">
+          <BrandLogo isDarkTheme={isDarkTheme} />
         </button>
         <nav className="marketing-nav" aria-label="Main navigation">
           <button onClick={() => scrollToSection('how-it-works')}>How it works</button>
@@ -242,7 +240,7 @@ export const MarketingLanding: React.FC<MarketingLandingProps> = ({ isDarkTheme,
       </main>
 
       <footer className="marketing-footer" id="footer">
-        <div className="marketing-container footer-grid"><div className="footer-brand"><button className="marketing-brand"><span className="marketing-brand-mark"><Sparkles className="w-4 h-4" /></span><span>GroupTrip <b>Ledger</b></span></button><p>Clearer trips. Fairer splits.<br />Fewer awkward reminders.</p><button className="marketing-primary" onClick={openTripSetup}>Start a Trip <ArrowRight className="w-4 h-4" /></button></div><div className="footer-links"><span>EXPLORE</span><button onClick={() => scrollToSection('home')}>Home</button><button onClick={() => scrollToSection('how-it-works')}>How it works</button><button onClick={() => scrollToSection('split-models')}>Split Models</button><button onClick={() => scrollToSection('pricing')}>Pricing</button><button onClick={() => scrollToSection('story')}>Our Story</button></div><div className="footer-links"><span>LEGAL</span><button>Privacy Policy</button><button>Terms & Conditions</button><button>Contact</button><a href="https://github.com/NameIsNotMentioned/Sigma" target="_blank" rel="noreferrer">GitHub</a></div><div className="newsletter"><span>ONE USEFUL EMAIL, OCCASIONALLY.</span><p>Trip planning ideas and product updates. No noise.</p><form onSubmit={(event) => { event.preventDefault(); setSubscribed(true); }}><input value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" type="email" required /><button type="submit">{subscribed ? <Check /> : <ArrowRight />}</button></form></div></div><div className="marketing-container footer-bottom"><span>© 2026 GroupTrip Ledger</span><span>Built for better group trips.</span></div>
+        <div className="marketing-container footer-grid">                <div className="footer-brand"><button className="marketing-brand logo-brand" aria-label="GroupTrip Ledger home"><BrandLogo isDarkTheme={isDarkTheme} /></button><p>Clearer trips. Fairer splits.<br />Fewer awkward reminders.</p><button className="marketing-primary" onClick={openTripSetup}>Start a Trip <ArrowRight className="w-4 h-4" /></button></div><div className="footer-links"><span>EXPLORE</span><button onClick={() => scrollToSection('home')}>Home</button><button onClick={() => scrollToSection('how-it-works')}>How it works</button><button onClick={() => scrollToSection('split-models')}>Split Models</button><button onClick={() => scrollToSection('pricing')}>Pricing</button><button onClick={() => scrollToSection('story')}>Our Story</button></div><div className="footer-links"><span>LEGAL</span><button>Privacy Policy</button><button>Terms & Conditions</button><button>Contact</button><a href="https://github.com/NameIsNotMentioned/Sigma" target="_blank" rel="noreferrer">GitHub</a></div><div className="newsletter"><span>ONE USEFUL EMAIL, OCCASIONALLY.</span><p>Trip planning ideas and product updates. No noise.</p><form onSubmit={(event) => { event.preventDefault(); setSubscribed(true); }}><input value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" type="email" required /><button type="submit">{subscribed ? <Check /> : <ArrowRight />}</button></form></div></div><div className="marketing-container footer-bottom"><span>© 2026 GroupTrip Ledger</span><span>Built for better group trips.</span></div>
       </footer>
     </div>
   );

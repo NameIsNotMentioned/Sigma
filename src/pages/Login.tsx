@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { ArrowRight, Check, Sparkles } from 'lucide-react';
+import { ArrowRight, Check } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { isSupabaseConfigured } from '../lib/supabaseClient';
 import { useAuth } from '../context/AuthContext';
+import { BrandLogo } from '../components/BrandLogo';
 
-export const Login: React.FC = () => {
+export const Login: React.FC<{ isDarkTheme?: boolean }> = ({ isDarkTheme = false }) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user, signIn, signUp } = useAuth();
@@ -39,9 +40,9 @@ export const Login: React.FC = () => {
     }
   };
 
-  return <main className="auth-page">
+  return <div className={isDarkTheme ? 'theme-dark' : undefined}><main className="auth-page">
     <section className="auth-card glass-panel">
-      <button className="marketing-brand" onClick={() => navigate('/')}><span className="marketing-brand-mark"><Sparkles className="w-4 h-4" /></span><span>GroupTrip <b>Ledger</b></span></button>
+      <button className="marketing-brand logo-brand" onClick={() => navigate('/')} aria-label="Go to homepage"><BrandLogo isDarkTheme={isDarkTheme} /></button>
       <span className="marketing-eyebrow">YOUR PRIVATE TRIP LEDGER</span>
       <h1>{mode === 'signin' ? 'Welcome back.' : 'Create your ledger.'}</h1>
       <p>Save trips, expenses, participants, and settlement calculations in one secure workspace.</p>
@@ -55,5 +56,5 @@ export const Login: React.FC = () => {
       <button className="auth-switch" onClick={() => { setMode(mode === 'signin' ? 'signup' : 'signin'); setMessage(''); }}>{mode === 'signin' ? 'Need an account? Create one' : 'Already have an account? Sign in'}</button>
       <div className="auth-points"><span><Check className="w-3 h-3" /> Row-level protected</span><span><Check className="w-3 h-3" /> Your data only</span></div>
     </section>
-  </main>;
+  </main></div>;
 };
