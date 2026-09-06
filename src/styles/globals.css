@@ -649,8 +649,12 @@ body {
 .data-panel form { display: grid; gap: 9px; }
 .data-panel form .marketing-primary { margin-top: 7px; }
 .trip-list { margin-top: 22px; border-top: 1px solid rgba(81,68,199,.12); }
-.trip-list-row { display: grid; width: 100%; gap: 3px; padding: 14px 3px; text-align: left; border-bottom: 1px solid rgba(81,68,199,.1); color: #554b85; }
-.trip-list-row span { color: #8b85a8; font-size: 11px; }
+.trip-list-row { display: flex; width: 100%; align-items: center; gap: 10px; padding: 14px 3px; border-bottom: 1px solid rgba(81,68,199,.1); }
+.trip-list-open { min-width: 0; flex: 1; display: grid; gap: 3px; text-align: left; color: #554b85; }
+.trip-list-open span { color: #8b85a8; font-size: 11px; }
+.trip-list-delete { display: grid; flex: 0 0 auto; width: 32px; height: 32px; place-items: center; border: 1px solid rgba(244,63,94,.2); border-radius: 9px; color: #c04461; background: rgba(244,63,94,.07); transition: background .2s ease, color .2s ease, transform .2s ease; }
+.trip-list-delete:hover:not(:disabled) { color: #fff; background: #c04461; transform: translateY(-1px); }
+.trip-list-delete:disabled { cursor: wait; opacity: .55; }
 .trip-list-row.active { color: #4f3abb; }
 .data-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 22px 0; }
 .data-stats div { padding: 14px; border-radius: 13px; background: rgba(81,68,199,.08); }
@@ -665,7 +669,7 @@ body {
 .theme-dark .auth-page, .theme-dark .data-page { background: linear-gradient(135deg, #0b1023, #17133d); color: #f4f2ff; }
 .theme-dark .auth-card, .theme-dark .data-panel { background: rgba(20,24,52,.78); border-color: rgba(175,165,255,.2); }
 .theme-dark .auth-card > p, .theme-dark .data-heading p, .theme-dark .data-user, .theme-dark .data-stats span { color: #aaa6ca; }
-.theme-dark .auth-card label, .theme-dark .trip-list-row, .theme-dark .saved-row { color: #d8d3f2; }
+.theme-dark .auth-card label, .theme-dark .trip-list-open, .theme-dark .saved-row { color: #d8d3f2; }
 .theme-dark .auth-card input, .theme-dark .data-panel input { color: #f4f2ff; background: rgba(5,8,25,.4); border-color: rgba(175,165,255,.22); }
 .theme-dark .data-stats div { background: rgba(175,165,255,.1); }
 .theme-dark .data-stats strong { color: #ffd37c; }
